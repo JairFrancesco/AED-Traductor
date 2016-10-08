@@ -1,0 +1,2 @@
+/home/bryce/Documentos/proyectos/AED/AED-Traductor/CMakeFiles/AED_Diccionario.dir
+/home/bryce/Documentos/proyectos/AED/AED-Traductor/CMakeFiles/AED_Diccionario_automoc.dir
