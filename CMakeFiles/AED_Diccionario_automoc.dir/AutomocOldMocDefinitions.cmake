@@ -1,1 +1,0 @@
-set(AM_OLD_COMPILE_SETTINGS "QT_CORE_LIB;QT_GUI_LIB;QT_NO_DEBUG;vtkRenderingCore_AUTOINIT=2(vtkInteractionStyle,vtkRenderingOpenGL2) ~~~ /usr/local/include/vtk-7.0;/home/bryce/Documentos/proyectos/AED/AED-Traductor;/usr/include/qt4;/usr/include/qt4/QtGui;/usr/include/qt4/QtCore ~~~  ~~~ FALSE ~~~ ")
