@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 
+
 template <class T>
 bool buscar(std::list<NodoF<T>* > l,NodoF<T>* p)
 {

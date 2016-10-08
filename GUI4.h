@@ -5,6 +5,7 @@
 #include "ui_GUI4.h"
 #include <rbnode.h>
 #include <rbtree.h>
+#include <Fheap.h>
 #include <QStandardItemModel>
 
 class vtkRenderer;
@@ -26,6 +27,7 @@ public slots:
              vtkCommand * command);
   void color1(QAction*);
   void cargarDatos(QString _rutaArchivo);
+  void cargarDatosHeap(QString _rutaArchivo);
   //void color2(QAction*);
 
 protected:

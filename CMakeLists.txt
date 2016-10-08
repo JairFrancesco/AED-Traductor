@@ -26,9 +26,9 @@ endif()
 
 set( Srcs main.cpp GUI4.cpp levenshtein.cpp)
 
-set( Hdrs GUI4.h DataStructures/AVL.h DataStructures/NodoArbol.h palabra.h DataStructures/rbnode.h DataStructures/rbtree.h DataStructures/cola.h DataStructures/nodo.h DataStructures/pila.h DataStructures/Fheap.h DataStructures/Nodof.h)
+set( Hdrs GUI4.h DataStructures/AVL.h DataStructures/NodoArbol.h palabra.h DataStructures/rbnode.h DataStructures/rbtree.h DataStructures/cola.h DataStructures/nodo.h DataStructures/pila.h DataStructures/Fheap.h DataStructures/NodoF.h)
 
-set( MOC_Hdrs GUI4.h DataStructures/AVL.h DataStructures/NodoArbol.h palabra.h DataStructures/rbnode.h DataStructures/rbtree.h DataStructures/cola.h DataStructures/nodo.h DataStructures/pila.h DataStructures/Fheap.h DataStructures/Nodof.h)
+set( MOC_Hdrs GUI4.h DataStructures/AVL.h DataStructures/NodoArbol.h palabra.h DataStructures/rbnode.h DataStructures/rbtree.h DataStructures/cola.h DataStructures/nodo.h DataStructures/pila.h DataStructures/Fheap.h DataStructures/NodoF.h)
 
 set( UIs GUI4.ui )
 

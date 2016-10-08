@@ -276,6 +276,59 @@ void GUI4::on_btnSeleccionarArchivo_clicked()
     }
 }
 
+//Para fibonacci Heap
+void GUI4::cargarDatosHeap(QString _rutaArchivo)
+{
+    string rutaArchivo = _rutaArchivo.toUtf8().constData();
+    std::string line;
+    //RBTree<Palabra> *arbol = new RBTree<Palabra>();
+    Fheap<Palabra>* fibHeap = new Fheap<Palabra>();
+    ifstream myfile (rutaArchivo.c_str());
+
+    QTime myTimer;
+    myTimer.start();
+    string idioma1;
+    string idioma2;
+
+    string::size_type pos;
+    int rowCount = 0;
+    if (myfile.is_open())
+    {
+      while (getline (myfile,line))
+      {
+          if (line.substr(0,1)!="#") //Evitar las lineas comentadas
+          {
+              pos=line.find("\t", 0);
+              if (pos>0) //Si es menor, entonces no hay tabs
+              {
+                  idioma1 = line.substr(0,pos);
+                  idioma2 = line.substr(pos+1);
+
+                  // Esta parte es para agregar los elementos a la tabla
+                  QString item1 = QString::fromStdString(idioma1);
+                  QString item2 = QString::fromStdString(idioma2);
+                  model->setItem(rowCount,0, new QStandardItem(item1));
+                  model->setItem(rowCount,1, new QStandardItem(item2));
+
+                  cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
+                  Palabra p(idioma1, idioma2);
+                  //arbol->insertar(p);
+                  //this->model->setRowCount(this->model->rowCount()+1);
+              }
+              rowCount++;
+          }
+      }
+      myfile.close();
+    }
+    else QMessageBox::information(0, "error, No se pudo abrir el archivo", QString("Error"));
+    int nMilliseconds = myTimer.elapsed();
+    QString s = QString::number(nMilliseconds);
+    txtTiempoCarga->setText(s);
+    tblDiccionario->setModel(this->model);
+}
+
+
+
 //Por el momento funciona solo con Red-Black Tree
 void GUI4::cargarDatos(QString _rutaArchivo)
 {
@@ -309,7 +362,7 @@ void GUI4::cargarDatos(QString _rutaArchivo)
                 model->setItem(rowCount,1, new QStandardItem(item2));
                 cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
                 Palabra p(idioma1, idioma2);
-                //arbol->insertar(p);
+                arbol->insertar(p);
                 //this->model->setRowCount(this->model->rowCount()+1);
             }
             rowCount++;
