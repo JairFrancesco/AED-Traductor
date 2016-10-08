@@ -24,11 +24,11 @@ if("${VTK_QT_VERSION}" STREQUAL "")
   message(FATAL_ERROR "VTK was not built with Qt")
 endif()
 
-set( Srcs main.cpp GUI4.cpp levenshtein.cpp )
+set( Srcs main.cpp GUI4.cpp levenshtein.cpp)
 
-set( Hdrs GUI4.h AVL.h Nodo.h palabra.h rbnode.h rbtree.h )
+set( Hdrs GUI4.h DataStructures/AVL.h DataStructures/NodoArbol.h palabra.h DataStructures/rbnode.h DataStructures/rbtree.h DataStructures/cola.h DataStructures/nodo.h DataStructures/pila.h)
 
-set( MOC_Hdrs GUI4.h AVL.h Nodo.h palabra.h rbnode.h rbtree.h)
+set( MOC_Hdrs GUI4.h DataStructures/AVL.h DataStructures/NodoArbol.h palabra.h DataStructures/rbnode.h DataStructures/rbtree.h DataStructures/cola.h DataStructures/nodo.h DataStructures/pila.h)
 
 set( UIs GUI4.ui )
 
@@ -36,6 +36,7 @@ set( UIs GUI4.ui )
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
+  DataStructures
 )
 
 # Instruct CMake to run moc automatically when needed.

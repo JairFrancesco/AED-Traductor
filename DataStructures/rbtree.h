@@ -16,6 +16,8 @@ class RBTree
             m_pnil_node = new RBNode<T>();
             m_pnil_node->color = BLACK;
             m_pnil_node->m_pPadre = m_pnil_node;
+            m_pnil_node->m_pDerecha = m_pnil_node;
+            m_pnil_node->m_pIzquierda = m_pnil_node;
             m_pRoot = m_pnil_node;
         };
 
@@ -24,11 +26,6 @@ class RBTree
         RBNode<T>* getNodo(T data); //Buscar
         void insertar(T data);
         void eliminar(T data);
-        //RBNode<T>* getPadre(Nodo<T>* p);
-        //RBNode<T>* getTio(Nodo<T>* p);
-        //RBNode<T>* getHermano(Nodo<T>* p);
-        bool soyIzquierdo();
-        bool soyDerecho();
         void printInOrder(RBNode<T>* p);
         void postorder(RBNode<T>* p, int indent =0);
         RBNode<T>* getRaiz()
@@ -84,6 +81,7 @@ void RBTree<T>::rotacionIzquierda(RBNode<T>* p)
     tmp->m_pIzquierda = p; //poner p a la izquierda de tmp
     p->m_pPadre = tmp;
 }
+
 //La rotacion a la derecha es simetrica a la rotacion a la izquierda
 //Rotacion Izquierda y rotacion derecha se ejecutan en un tiempo O(1)
 //Solo los punteros cambian por rotación, todos los demas atributos permanecen igual
@@ -112,30 +110,32 @@ void RBTree<T>::rotacionDerecha(RBNode<T>* p)
 template <class T>
 void RBTree<T>::insertar(T data)
 {
-    RBNode<T>* p = new RBNode<T>(data);
+    RBNode<T>* p = new RBNode<T>(data); //Nuevo nodo
     RBNode<T>* y = m_pnil_node;
     RBNode<T>* x = m_pRoot;
+
+    //Inserción comun en un BST
     while (x != m_pnil_node)
     {
-        y = x;
+        y = x; //Actualizamos y
         if (p->m_Dato < x->m_Dato)
             x = x->m_pIzquierda;
         else
             x = x->m_pDerecha;
-    }
-
+    }    
     p->m_pPadre = y;
+
     if (y == m_pnil_node)
         m_pRoot = p;
-    else if (p->m_Dato < y->m_Dato)
+    else if (p->m_Dato < y->m_Dato) //Dependiendo del dato ingresado lo colocamos como hijo derecho o izquierdo
         y->m_pIzquierda = p;
     else
         y->m_pDerecha = p;
 
-    p->m_pIzquierda = m_pnil_node;
+    p->m_pIzquierda = m_pnil_node; //Cumplimos con las propiedades de un RB-Tree
     p->m_pDerecha = m_pnil_node;
     p->color = RED;
-    insertFixup(p);
+    insertFixup(p); //Para restaurar las propiedades de RB-Tree
 }
 
 
@@ -144,7 +144,7 @@ void RBTree<T>::transplantar(RBNode<T>* nodoDestino, RBNode<T>* nodoOrigen)
 {
     if (nodoDestino->m_pPadre == m_pnil_node)
         m_pRoot = nodoDestino;
-    else if (nodoDestino == nodoDestino->m_pPadre->m_pIzquierda)
+    else if (nodoDestino->soyIzquierdo())
         nodoDestino->m_pPadre->m_pIzquierda = nodoOrigen;
     else
         nodoDestino->m_pPadre->m_pDerecha = nodoOrigen;
@@ -154,43 +154,37 @@ void RBTree<T>::transplantar(RBNode<T>* nodoDestino, RBNode<T>* nodoOrigen)
 template <class T>
 void RBTree<T>::insertFixup(RBNode<T>* p)
 {
+    bool esIzquierdo = false;
     RBNode<T> * tmp;
-    while (p->m_pPadre->color == RED) {
-        if (p->m_pPadre == p->m_pPadre->m_pPadre->m_pIzquierda) {
-            tmp = p->m_pPadre->m_pPadre->m_pDerecha;
-            if (tmp->color == RED) {
-                p->m_pPadre->color = BLACK;         //Caso 1
-                tmp->color = BLACK;                 //Caso 1
-                p->m_pPadre->m_pPadre->color = RED; //Caso 1
-                p = p->m_pPadre->m_pPadre;          //Caso 1
-            }
-            else {
-                if (p == p->m_pPadre->m_pDerecha) {
-                    p = p->m_pPadre;                //Caso 2
-                    rotacionIzquierda(p);           //Caso 2
-                }
-                p->m_pPadre->color = BLACK;         //Caso 3
-                p->m_pPadre->m_pPadre->color = RED; //Caso 3
-                rotacionDerecha(p->m_pPadre->m_pPadre);//Caso 3
-            }
+    while (p->getPadre()->color == RED) {
+        tmp = p->getTio();
+        if (tmp->color == RED) //Caso 1
+        {
+            p->getPadre()->color = BLACK; //Caso 1
+            tmp->color = BLACK; //Caso 1
+            p->getAbuelo()->color = RED;//Caso 1
+            p = p->getAbuelo(); //Caso 1
         }
-        else { //lo mismo, con m_pIzquierda y m_pDerecha intercambiados
-            tmp = p->m_pPadre->m_pPadre->m_pIzquierda;
-            if (tmp->color == RED) {
-                p->m_pPadre->color = BLACK;
-                tmp->color = BLACK;
-                p->m_pPadre->m_pPadre->color = RED;
-                p = p->m_pPadre->m_pPadre;
+        else
+        {
+            if (p->soyDerecho()) //Caso 2
+            {
+                p = p->getPadre();   //Caso 2
+                rotacionIzquierda(p); //Caso 2
+                esIzquierdo = false;
             }
-            else {
-                if (p == p->m_pPadre->m_pIzquierda) {
-                    p = p->m_pPadre;
-                    rotacionDerecha(p);
-                }
-                p->m_pPadre->color = BLACK;
-                p->m_pPadre->m_pPadre->color = RED;
-                rotacionIzquierda(p->m_pPadre->m_pPadre);
+            else
+            {
+                p = p->getPadre();
+                rotacionDerecha(p);
+                esIzquierdo = true;
             }
+            p->getPadre()->color = BLACK; //Caso 3
+            p->getAbuelo()->color = RED; //Caso 3
+            if (esIzquierdo)
+                rotacionIzquierda(p->getAbuelo()); //Caso 3
+            else
+                rotacionDerecha(p->getAbuelo()); //Caso 3
         }
     }
     this->m_pRoot->color = BLACK;
@@ -200,10 +194,12 @@ void RBTree<T>::insertFixup(RBNode<T>* p)
 template <class T>
 void RBTree<T>::eliminar(T data)
 {
-    RBNode<T> * p = getNodo(data);
-    RBNode<T> * tmp = p;
+    RBNode<T> * p = getNodo(data); //Nodo a eliminar
+    RBNode<T> * tmp = p; //Mas adelante sera el sucesor(Siguiente) del nodo a eliminar
     RBNode<T> * tmp2;
     Color colorOriginal = tmp->color;
+    //Realiza practicamente el mismo procedimiento que un BST-Delete
+    //Si solo tiene un hijo
     if (p->m_pIzquierda == m_pnil_node) {
         tmp2 = p->m_pDerecha;
         transplantar(p, p->m_pDerecha);
@@ -212,7 +208,9 @@ void RBTree<T>::eliminar(T data)
     {
         tmp2 = p->m_pIzquierda;
         transplantar(p, p->m_pIzquierda);
-    } else {
+    }
+    else //Si tiene dos hijos
+    {
         tmp = getTreeMinimum(p->m_pDerecha);
         colorOriginal = tmp->color;
         tmp2 = tmp->m_pDerecha;
@@ -229,29 +227,42 @@ void RBTree<T>::eliminar(T data)
         tmp->color = p->color;
     }
     if (colorOriginal == BLACK)
-        deleteFixup(tmp2);
+        deleteFixup(tmp2); //Cambia los colores y realiza rotaciones para restaurar las propiedades RED-BLACK
 }
 
 template <class T>
 void RBTree<T>::deleteFixup(RBNode<T>* p)
 {
     RBNode<T> * tmp;
-
     while (p != m_pRoot && p->color == BLACK) {
-        if (p == p->m_pPadre->m_pIzquierda) {
-            tmp = p->m_pPadre->m_pDerecha;
-            if (tmp->color == RED) {
-                tmp->color = BLACK;                         //Caso 1
-                p->m_pPadre->color = RED;                   //Caso 1
-                rotacionIzquierda(p->m_pPadre);             //Caso 1
+        tmp = p->getHermano();
+        if (tmp->color == RED) //Caso1: el hermano de p es rojo
+        {
+            tmp->color = BLACK;                         //Caso 1
+            p->getPadre()->color = RED;                 //Caso 1
+            if (p->soyIzquierdo())
+            {
+                rotacionIzquierda(p->getPadre());             //Caso 1
                 tmp = p->m_pPadre->m_pDerecha;              //Caso 1
-            }
-            if (tmp->m_pIzquierda->color == BLACK && tmp->m_pDerecha->color == BLACK) {
-                tmp->color = RED;                           //Caso 2
-                p = p->m_pPadre;                            //Caso 2
             }
             else
             {
+                rotacionDerecha(p->getPadre());             //Caso 1
+                tmp = p->m_pPadre->m_pIzquierda;              //Caso 1
+            }
+
+        }
+        //Caso2: el hermano de p: (tmp) es negro y ambos hijos de tmp son negros
+        if (tmp->m_pIzquierda->color == BLACK && tmp->m_pDerecha->color == BLACK) {
+            tmp->color = RED;                           //Caso 2
+            p = p->getPadre();                            //Caso 2
+        }
+        else
+        {
+            if (p->soyIzquierdo())
+            {
+                //Caso3: el hermano de p: (tmp) es negro, el hijo izquierdo de tmp es rojo
+                    //y el hijo derecho de tmp es negro.
                 if (tmp->m_pDerecha->color == BLACK)
                 {
                     tmp->m_pIzquierda->color = BLACK;       //Caso 3
@@ -259,36 +270,32 @@ void RBTree<T>::deleteFixup(RBNode<T>* p)
                     rotacionDerecha(tmp);                   //Caso 3
                     tmp = p->m_pPadre->m_pDerecha;          //Caso 3
                 }
+                //Caso 4: el hermano de p: (tmp) es negro y el hijo derecho de tmp es rojo
                 tmp->color = p->m_pPadre->color;            //Caso 4
                 p->m_pPadre->color = BLACK;                 //Caso 4
                 tmp->m_pDerecha->color = BLACK;             //Caso 4
                 rotacionIzquierda(p->m_pPadre);             //Caso 4
                 p = m_pRoot;                                //Caso 4
             }
-        } else { //Lo mismo pero con m_pIzquierda y m_pDerecha intercambiados
-            tmp = p->m_pPadre->m_pIzquierda;
-            if (tmp->color == RED) {
-                tmp->color = BLACK;
-                p->m_pPadre->color = RED;
-                rotacionDerecha(p->m_pPadre);
-                tmp = p->m_pPadre->m_pIzquierda;
-            }
-            if (tmp->m_pDerecha->color == BLACK && tmp->m_pIzquierda->color == BLACK) {
-                tmp->color = RED;
-                p = p->m_pPadre;
-            } else {
-                if (tmp->m_pIzquierda->color == BLACK) {
-                    tmp->m_pDerecha->color = BLACK;
-                    tmp->color = RED;
-                    rotacionIzquierda(tmp);
-                    tmp = p->m_pPadre->m_pIzquierda;
+            else
+            {
+                //Caso3: el hermano de p: (tmp) es negro, el hijo derecho de tmp es rojo
+                    //y el hijo derecho de tmp es negro.
+                if (tmp->m_pIzquierda->color == BLACK)
+                {
+                    tmp->m_pDerecha->color = BLACK;       //Caso 3
+                    tmp->color = RED;                       //Caso 3
+                    rotacionIzquierda(tmp);                   //Caso 3
+                    tmp = p->m_pPadre->m_pIzquierda;          //Caso 3
                 }
-                tmp->color = p->m_pPadre->color;
-                p->m_pPadre->color = BLACK;
-                tmp->m_pIzquierda->color = BLACK;
-                rotacionDerecha(p->m_pPadre);
-                p = m_pRoot;
+                //Caso 4: el hermano de p: (tmp) es negro y el hijo derecho de tmp es rojo
+                tmp->color = p->m_pPadre->color;            //Caso 4
+                p->m_pPadre->color = BLACK;                 //Caso 4
+                tmp->m_pIzquierda->color = BLACK;             //Caso 4
+                rotacionDerecha(p->m_pPadre);             //Caso 4
+                p = m_pRoot;                                //Caso 4
             }
+
         }
     }
     p->color = BLACK;
@@ -318,7 +325,7 @@ void RBTree<T>::printInOrder(RBNode<T>* p)
         if (p->m_pDerecha) printInOrder(p->m_pDerecha);
 
     }
-    catch (exception_ptr &e)
+    catch (exception &e)
     {
         cout<< "Algo sucedio...."<<endl;
     }

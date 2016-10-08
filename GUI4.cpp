@@ -1,38 +1,5 @@
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    GUI4.cxx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-
-/*=========================================================================
-
-  Copyright 2004 Sandia Corporation.
-  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
-  license for use of this work by or on behalf of the
-  U.S. Government. Redistribution and use in source and binary forms, with
-  or without modification, are permitted provided that this Notice and any
-  statement of authorship are reproduced on all copies.
-
-=========================================================================*/
-
-/*========================================================================
- For general information about using VTK and Qt, see:
- http://www.trolltech.com/products/3rdparty/vtksupport.html
-=========================================================================*/
-
 #include "GUI4.h"
-
 #include <QMenu>
-
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkCommand.h"
@@ -45,27 +12,42 @@
 #include "vtkTDxInteractorStyleCamera.h"
 #include "vtkTDxInteractorStyleSettings.h"
 #include "QVTKInteractor.h"
-#include <QMessageBox>
 #include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <QTime>
+#include <QFile>
+#include <QTextStream>
+#include <QStandardItem>
+#include <palabra.h>
+
+using namespace std;
 
 GUI4::GUI4()
 {
   this->setupUi(this);
+
+  //Table View
+  model->setHorizontalHeaderItem(0, new QStandardItem(QString("Idioma 1")));
+  model->setHorizontalHeaderItem(1, new QStandardItem(QString("Idioma 2")));
+  tblDiccionario->setModel(this->model);
 
   // create a window to make it stereo capable and give it to QVTKWidget
   vtkRenderWindow* renwin = vtkRenderWindow::New();
   renwin->StereoCapableWindowOn();
 
   // Activate 3DConnexion device only on the left render window.
-  qVTK1->SetUseTDx(true);
-
-  qVTK1->SetRenderWindow(renwin);
+  qVTKGrafico->SetUseTDx(true);
+  qVTKGrafico->SetRenderWindow(renwin);
   renwin->Delete();
 
   const double angleSensitivity=0.02;
   const double translationSensitivity=0.001;
 
-  QVTKInteractor *iren=qVTK1->GetInteractor();
+  QVTKInteractor *iren=qVTKGrafico->GetInteractor();
   vtkInteractorStyle *s=
     static_cast<vtkInteractorStyle *>(iren->GetInteractorStyle());
   vtkTDxInteractorStyleCamera *t=
@@ -79,59 +61,37 @@ GUI4::GUI4()
 
 
   // add a renderer
-  Ren1 = vtkRenderer::New();
-  qVTK1->GetRenderWindow()->AddRenderer(Ren1);
+  Renderizador = vtkRenderer::New();
+  qVTKGrafico->GetRenderWindow()->AddRenderer(Renderizador);
 
   // add a popup menu for the window and connect it to our slot
-  QMenu* popup1 = new QMenu(qVTK1);
+  QMenu* popup1 = new QMenu(qVTKGrafico);
   popup1->addAction("Background White");
   popup1->addAction("Background Black");
   popup1->addAction("Stereo Rendering");
   connect(popup1, SIGNAL(triggered(QAction*)), this, SLOT(color1(QAction*)));
 
+  /*
   // put cone in one window
   vtkConeSource* cone = vtkConeSource::New();
   vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(cone->GetOutputPort());
   vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
-  Ren1->AddViewProp(actor);
+  Renderizador->AddViewProp(actor);
   actor->Delete();
   mapper->Delete();
   cone->Delete();
+  */
 
-  // create a window to make it stereo capable and give it to QVTKWidget
-  renwin = vtkRenderWindow::New();
-  renwin->StereoCapableWindowOn();
-
-  qVTK2->SetUseTDx(true);
-  qVTK2->SetRenderWindow(renwin);
-  renwin->Delete();
-
-  QVTKInteractor *iren2=qVTK2->GetInteractor();
-  vtkInteractorStyle *s2=
-    static_cast<vtkInteractorStyle *>(iren2->GetInteractorStyle());
-  vtkTDxInteractorStyle *t2=s2->GetTDxStyle();
-  t2->SetSettings(t->GetSettings());
-
-  // add a renderer
-  Ren2 = vtkRenderer::New();
-  qVTK2->GetRenderWindow()->AddRenderer(Ren2);
-
-  // add a popup menu for the window and connect it to our slot
-  QMenu* popup2 = new QMenu(qVTK2);
-  popup2->addAction("Background White");
-  popup2->addAction("Background Black");
-  popup2->addAction("Stereo Rendering");
-  connect(popup2, SIGNAL(triggered(QAction*)), this, SLOT(color2(QAction*)));
-
-  // put sphere in other window
+  // put sphere in the window
   vtkSphereSource* sphere = vtkSphereSource::New();
+  vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(sphere->GetOutputPort());
-  actor = vtkActor::New();
+  vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
-  Ren2->AddViewProp(actor);
+  Renderizador->AddViewProp(actor);
   actor->Delete();
   mapper->Delete();
   sphere->Delete();
@@ -140,19 +100,21 @@ GUI4::GUI4()
   Connections = vtkEventQtSlotConnect::New();
 
   // get right mouse pressed with high priority
-  Connections->Connect(qVTK1->GetRenderWindow()->GetInteractor(),
+  Connections->Connect(qVTKGrafico->GetRenderWindow()->GetInteractor(),
                        vtkCommand::RightButtonPressEvent,
                        this,
                        SLOT(popup( vtkObject*, unsigned long, void*, void*, vtkCommand*)),
                        popup1, 1.0);
-
+  /*
   // get right mouse pressed with high priority
   Connections->Connect(qVTK2->GetRenderWindow()->GetInteractor(),
                        vtkCommand::RightButtonPressEvent,
                        this,
                        SLOT(popup( vtkObject*, unsigned long, void*, void*, vtkCommand*)),
                        popup2, 1.0);
+  */
 
+  /*
   // connect window enter event to radio button slot
   Connections->Connect(qVTK1->GetRenderWindow()->GetInteractor(),
                        vtkCommand::EnterEvent,
@@ -165,25 +127,27 @@ GUI4::GUI4()
                        radio2,
                        SLOT(animateClick()));
 
+  */
   // update coords as we move through the window
-  Connections->Connect(qVTK1->GetRenderWindow()->GetInteractor(),
+  Connections->Connect(qVTKGrafico->GetRenderWindow()->GetInteractor(),
                        vtkCommand::MouseMoveEvent,
                        this,
                        SLOT(updateCoords(vtkObject*)));
 
+  /*
   // update coords as we move through the window
   Connections->Connect(qVTK2->GetRenderWindow()->GetInteractor(),
                        vtkCommand::MouseMoveEvent,
                        this,
                        SLOT(updateCoords(vtkObject*)));
-
+  */
   Connections->PrintSelf(cout, vtkIndent());
 }
 
 GUI4::~GUI4()
 {
-  Ren1->Delete();
-  Ren2->Delete();
+  Renderizador->Delete();
+  //Ren2->Delete();
 
   Connections->Delete();
 }
@@ -238,16 +202,17 @@ void GUI4::popup(vtkObject * obj, unsigned long,
 void GUI4::color1(QAction* color)
 {
   if(color->text() == "Background White")
-    Ren1->SetBackground(1,1,1);
+    Renderizador->SetBackground(1,1,1);
   else if(color->text() == "Background Black")
-    Ren1->SetBackground(0,0,0);
+    Renderizador->SetBackground(0,0,0);
   else if(color->text() == "Stereo Rendering")
   {
-    Ren1->GetRenderWindow()->SetStereoRender(!Ren1->GetRenderWindow()->GetStereoRender());
+    Renderizador->GetRenderWindow()->SetStereoRender(!Renderizador->GetRenderWindow()->GetStereoRender());
   }
-  qVTK1->update();
+  qVTKGrafico->update();
 }
 
+/*
 void GUI4::color2(QAction* color)
 {
   if(color->text() == "Background White")
@@ -260,6 +225,7 @@ void GUI4::color2(QAction* color)
   }
   qVTK2->update();
 }
+*/
 
 
 void GUI4::on_pushButton_clicked()
@@ -273,4 +239,87 @@ void GUI4::on_pushButton_clicked()
       } else {
         qDebug() << "Yes was *not* clicked";
       }
+}
+
+void GUI4::on_cbTipoEd_currentIndexChanged(int index)
+{
+    QMessageBox* msgBox;
+    msgBox  = new QMessageBox();
+    msgBox->setWindowTitle("Mensaje de prueba");
+    if (index==0)
+    {
+        msgBox->setText("Ha Seleccionado Red-Black");
+        msgBox->show();
+    } else if (index==1)
+    {
+        msgBox->setText("Ha Seleccionado AVL");
+        msgBox->show();
+    } else
+    {
+        msgBox->setText("Ha Seleccionado otros");
+        msgBox->show();
+    }
+}
+
+void GUI4::on_btnSeleccionarArchivo_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Abrir diccionario"), ".", tr("Archivos de texto (*.txt)"));
+    if (!fileName.isEmpty())
+    {
+        txtRutaArchivo->setText(fileName);
+        //Cargar palabras al arbol y calcular tiempo de carga
+        cargarDatos(fileName);
+    }
+    else
+    {
+        QMessageBox m; m.setText("No se ha seleccionado un diccionario"); m.exec();
+    }
+}
+
+//Por el momento funciona solo con Red-Black Tree
+void GUI4::cargarDatos(QString _rutaArchivo)
+{
+  string rutaArchivo = _rutaArchivo.toUtf8().constData();
+  std::string line;
+  RBTree<Palabra> *arbol = new RBTree<Palabra>();
+  ifstream myfile (rutaArchivo.c_str());
+
+  QTime myTimer;
+  myTimer.start();
+  string idioma1;
+  string idioma2;
+
+  string::size_type pos;
+  int rowCount = 0;
+  if (myfile.is_open())
+  {
+    while (getline (myfile,line))
+    {
+        if (line.substr(0,1)!="#") //Evitar las lineas comentadas
+        {
+            pos=line.find("\t", 0);
+            if (pos>0) //Si es menor, entonces no hay tabs
+            {
+                idioma1 = line.substr(0,pos);
+                idioma2 = line.substr(pos+1);
+
+                QString item1 = QString::fromStdString(idioma1);
+                QString item2 = QString::fromStdString(idioma2);
+                model->setItem(rowCount,0, new QStandardItem(item1));
+                model->setItem(rowCount,1, new QStandardItem(item2));
+                cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
+                Palabra p(idioma1, idioma2);
+                //arbol->insertar(p);
+                //this->model->setRowCount(this->model->rowCount()+1);
+            }
+            rowCount++;
+        }
+    }
+    myfile.close();
+  }
+  else QMessageBox::information(0, "error, No se pudo abrir el archivo", QString("Error"));
+  int nMilliseconds = myTimer.elapsed();
+  QString s = QString::number(nMilliseconds);
+  txtTiempoCarga->setText(s);
+  tblDiccionario->setModel(this->model);
 }

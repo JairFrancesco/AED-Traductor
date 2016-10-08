@@ -1,6 +1,6 @@
 #ifndef AVL_H
 #define AVL_H
-#include "Nodo.h"
+#include "NodoArbol.h"
 
 template<class T>
 class AVL

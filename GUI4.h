@@ -1,34 +1,11 @@
-/*=========================================================================
-
-  Copyright 2004 Sandia Corporation.
-  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
-  license for use of this work by or on behalf of the
-  U.S. Government. Redistribution and use in source and binary forms, with
-  or without modification, are permitted provided that this Notice and any
-  statement of authorship are reproduced on all copies.
-
-=========================================================================*/
-
-/*========================================================================
- For general information about using VTK and Qt, see:
- http://www.trolltech.com/products/3rdparty/vtksupport.html
-=========================================================================*/
-
-/*========================================================================
- !!! WARNING for those who want to contribute code to this file.
- !!! If you use a commercial edition of Qt, you can modify this code.
- !!! If you use an open source version of Qt, you are free to modify
- !!! and use this code within the guidelines of the GPL license.
- !!! Unfortunately, you cannot contribute the changes back into this
- !!! file.  Doing so creates a conflict between the GPL and BSD-like VTK
- !!! license.
-=========================================================================*/
-
 #ifndef _GUI_h
 #define _GUI_h
 
 #include <QMainWindow>
 #include "ui_GUI4.h"
+#include <rbnode.h>
+#include <rbtree.h>
+#include <QStandardItemModel>
 
 class vtkRenderer;
 class vtkEventQtSlotConnect;
@@ -48,14 +25,18 @@ public slots:
              void * client_data, void *,
              vtkCommand * command);
   void color1(QAction*);
-  void color2(QAction*);
+  void cargarDatos(QString _rutaArchivo);
+  //void color2(QAction*);
 
 protected:
-  vtkRenderer* Ren1;
-  vtkRenderer* Ren2;
+  vtkRenderer* Renderizador;
+  QStandardItemModel *model = new QStandardItemModel();
+  //vtkRenderer* Ren2;
   vtkEventQtSlotConnect* Connections;
 private slots:
   void on_pushButton_clicked();
+  void on_cbTipoEd_currentIndexChanged(int index);
+  void on_btnSeleccionarArchivo_clicked();
 };
 
 #endif // _GUI_h
