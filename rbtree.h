@@ -1,7 +1,7 @@
 #ifndef RBTREE_H
 #define RBTREE_H
 
-#include <RBNode.h>
+#include <rbnode.h>
 #include <iomanip>
 #include <iostream>
 

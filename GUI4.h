@@ -24,16 +24,39 @@
  !!! license.
 =========================================================================*/
 
-#include "QVTKApplication.h"
+#ifndef _GUI_h
+#define _GUI_h
 
-#include "GUI4.h"
+#include <QMainWindow>
+#include "ui_GUI4.h"
 
-int main(int argc, char** argv)
+class vtkRenderer;
+class vtkEventQtSlotConnect;
+class vtkObject;
+class vtkCommand;
+
+class GUI4 : public QMainWindow, public Ui::GUI
 {
-  QVTKApplication app(argc, argv);
-  GUI4 widget;
+  Q_OBJECT
+public:
+  GUI4();
+  ~GUI4();
 
-  widget.show();
+public slots:
+  void updateCoords(vtkObject*);
+  void popup(vtkObject * obj, unsigned long,
+             void * client_data, void *,
+             vtkCommand * command);
+  void color1(QAction*);
+  void color2(QAction*);
 
-  return app.exec();
-}
+protected:
+  vtkRenderer* Ren1;
+  vtkRenderer* Ren2;
+  vtkEventQtSlotConnect* Connections;
+private slots:
+  void on_pushButton_clicked();
+};
+
+#endif // _GUI_h
+
