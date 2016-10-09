@@ -6,26 +6,15 @@
 #include <vector>
 
 
-template <class T>
-bool buscar(std::list<NodoF<T>* > l,NodoF<T>* p)
-{
-    for (auto i:l)
-    {
-        if (&(*i)==p)
-            return true;
-    }
-    return false;
-
-}
 
 template <class T>
 void imprimir_vector(std::vector<NodoF<T>* > l)
 {
     std::cout<<"{ ";
-    for (auto i: l)
+    for (typename std::vector<NodoF<T>* >::iterator it=l.begin();it!=l.end();it++)
     {
-        if (i)
-            std::cout<<(i)->valor<<" -> ";
+        if (*it)
+            std::cout<<(*it)->valor<<" -> ";
         else
             std::cout<<"vacio"<<" -> ";
     }
@@ -37,8 +26,8 @@ template <class T>
 void imprimir_lista(std::list<NodoF<T>* > l)
 {
     std::cout<<"{ ";
-    for (auto it : l)
-        std::cout<< (it)->valor<<","<<(it)->get_grado()<<" -> ";
+    for (typename std::list<NodoF<T>* >::iterator it=l.begin();it!=l.end();it++)
+        std::cout<< (*it)->valor<<","<<(*it)->get_grado()<<" -> ";
     std::cout<< "}"<<std::endl;
 }
 
@@ -68,8 +57,10 @@ class Fheap
         {
             return (*minimo)->valor;
         }
+        void mostrar();
         void decrease_key(Fnodo&, T);
         void compactar();
+        void split(Fiterator,int);
         void eliminar_min();
         virtual ~Fheap(){}
     protected:
@@ -79,6 +70,34 @@ class Fheap
 
 };
 
+template <class T>
+void Fheap<T>::split(Fiterator it, int n)
+{
+    if (!(*it) ) return;
+    for (int i=0;i<n;i++)
+        std::cout<<"  ";
+    std::cout<<"la raiz es: "<<(*it)->valor<<std::endl;
+    for (int i=0;i<n;i++)
+        std::cout<<"  ";
+    std::cout<<"los hijos de: "<<(*it)->valor<<" son :  ";
+    imprimir_lista((*it)->hijos);
+    Fiterator it2=(*it)->hijos.begin();
+    split(it2,n+1);
+    split(++it2,n+1);
+}
+
+template <class T>
+void Fheap<T>::mostrar()
+{
+    Fiterator it=raices.begin();
+    while (it!=raices.end())
+    {
+        split(it,0);
+        it++;
+        std::cout<<"--------------------------------"<<std::endl;
+    }
+
+}
 
 template <class T>
 void Fheap<T>::unir(Fheap<T> otro)
@@ -103,7 +122,7 @@ template <class T>
 void Fheap<T>::actualizar_min()
 {
     Fiterator vmini=raices.begin();
-    for (Fiterator mini=raices.begin();mini=raices.end();mini++)
+    for (Fiterator mini=raices.begin();mini!=raices.end();mini++)
     {
         if ((*vmini)->valor>(*mini)->valor)
             vmini=mini;
@@ -157,21 +176,21 @@ void Fheap<T>::compactar()
     NodoF<T>* aux=*it;
     while (it!=raices.end())
     {
-        std::cout<<"el nodo entrante es: "<<(*it)->valor<<" *  ";
+        //std::cout<<"el nodo entrante es: "<<(*it)->valor<<" *  ";
         int grado=(*it)->get_grado();
         if (!v.at(grado))
         {
-            std::cout<<"En este grado puede llenarse: "<<(*it)->valor<<std::endl;
+          //  std::cout<<"En este grado puede llenarse: "<<(*it)->valor<<std::endl;
             v.at(grado)=*it;
             it++;
         }
         else
         {
-            std::cout<<"En este grado no puede llenarse: "<<(*it)->valor<<std::endl;
+            //std::cout<<"En este grado no puede llenarse: "<<(*it)->valor<<std::endl;
             Fiterator itaux=it;
             if ((v.at(grado))->valor<(*it)->valor)
             {
-                std::cout<<"el del vector padre (vector) "<<(v.at(grado))->valor<<"       ";
+              //  std::cout<<"el del vector padre (vector) "<<(v.at(grado))->valor<<"       ";
                 Fiterator itaux=find(raices.begin(),raices.end(),v.at(grado));
                 unir_raices(v.at(grado),*it);
                 it=itaux;
@@ -192,7 +211,7 @@ void Fheap<T>::compactar()
             else
             {
 
-                std::cout<<"el del vector padre (iterador) "<<(*it)->valor<<"       ";
+                //std::cout<<"el del vector padre (iterador) "<<(*it)->valor<<"       ";
 //                int agrado=(*it)->
                 unir_raices(*it,v.at(grado));
 
@@ -211,16 +230,16 @@ void Fheap<T>::compactar()
 
 
         }
-        std::cout<<"raices: ";
+        /*std::cout<<"raices: ";
         imprimir_lista(raices);
         std::cout<<"vec: ";
         imprimir_vector(v);
-        std::cout<<"------------------------------"<<std::endl;
+        std::cout<<"------------------------------"<<std::endl;*/
 //        it++;
 
     }
-    std::cout<<"vec: ";
-    imprimir_vector(v);
+    //std::cout<<"vec: ";
+    //imprimir_vector(v);
 
 
 }
@@ -255,8 +274,8 @@ void Fheap<T>::unir_raices(NodoF<T>*& a, NodoF<T>*& b)
         a->hijos.push_front(b);
         //std::cout<<"va: "<<b->valor<<std::endl;
         b->padre=a;
-        std::cout<<"prueba: ";
-        imprimir_lista(a->hijos);
+        //std::cout<<"prueba: ";
+        //imprimir_lista(a->hijos);
 
     }
 
