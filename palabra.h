@@ -15,6 +15,9 @@ class Palabra
         bool operator==(Palabra &p2);
         bool operator!=(Palabra &p2);
         bool operator<(Palabra &p2);
+        bool operator>(Palabra &p2);
+        bool operator<=(Palabra &p2);
+        bool operator>=(Palabra &p2);
 
         //friend ostream & operator<< (ostream &, string &);
 };
@@ -29,7 +32,7 @@ ostream & operator<< (ostream & salida, Palabra & s){
 
 bool Palabra::operator==(Palabra &p2)
 {
-    return (this->idioma1 == p2.idioma1 || this->idioma2 == p2.idioma2);
+    return (this->idioma1 == p2.idioma1 && this->idioma2 == p2.idioma2);
 }
 
 bool Palabra::operator!=(Palabra &p2)
@@ -40,6 +43,33 @@ bool Palabra::operator!=(Palabra &p2)
 bool Palabra::operator<(Palabra &p2)
 {
     if ((this->idioma1).compare(p2.idioma1)<0 && (this->idioma2).compare(p2.idioma2)<0)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Palabra::operator>(Palabra &p2)
+{
+    if ((this->idioma1).compare(p2.idioma1)>0 && (this->idioma2).compare(p2.idioma2)>0)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Palabra::operator >=(Palabra &p2)
+{
+    if ((this->idioma1).compare(p2.idioma1)>=0 && (this->idioma2).compare(p2.idioma2)>=0)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Palabra::operator <=(Palabra &p2)
+{
+    if ((this->idioma1).compare(p2.idioma1)<=0 && (this->idioma2).compare(p2.idioma2)<=0)
     {
         return true;
     }

@@ -268,7 +268,10 @@ void GUI4::on_btnSeleccionarArchivo_clicked()
     {
         txtRutaArchivo->setText(fileName);
         //Cargar palabras al arbol y calcular tiempo de carga
-        cargarDatos(fileName);
+        //cargarDatos(fileName);
+
+        //Cargar palabras al fib heap y calcular tiempo de carga
+        cargarDatosHeap(fileName);
     }
     else
     {
@@ -312,7 +315,7 @@ void GUI4::cargarDatosHeap(QString _rutaArchivo)
 
                   cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
                   Palabra p(idioma1, idioma2);
-                  //arbol->insertar(p);
+                  fibHeap->insertar(p);
                   //this->model->setRowCount(this->model->rowCount()+1);
               }
               rowCount++;
