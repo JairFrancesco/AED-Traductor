@@ -17,13 +17,93 @@ class Lista
         void Add(T d,Nodo<T>*& p);
         void pushBack(T d);
         void print();
+        void max_r(Nodo<T>* aux, T maximum);
         bool exists(T d);
         void intersection(Lista<T>* L2);
-        Nodo<T>* getHead();
+        Nodo<T>*& getHead();
         void print_r(Nodo<T>* aux);
+        Nodo<T>* begin()
+        {
+            m_pCurrent = m_phead;
+            return m_phead;
+        }
+        Nodo<T>* end()
+        {
+            return m_plast;
+        }
+        bool terminate()
+        {
+            return m_plast == m_pCurrent;
+        }
+        Nodo<T>* previous(){
+            Nodo<T>* aux;
+            aux = m_phead;
+            while ((aux->m_psig)!=m_pCurrent)
+            {
+                aux = aux->m_psig;
+            }
+            m_pCurrent = aux;
+            return m_pCurrent;
+        }
+        Nodo<T>* next()
+        {
+            if (!m_pCurrent->m_psig) return 0;
+            m_pCurrent = m_pCurrent->m_psig;
+        }
+        Lista & operator++() // ++A
+        {
+            // Do increment of "this" value
+            if (!m_pCurrent->m_psig) return;
+            m_pCurrent = m_pCurrent->m_psig;
+            return *this ;
+        }
+
+        Lista operator++(int) // A++
+        {
+           T temp = *this ;
+           if (!m_pCurrent->m_psig) return;
+           m_pCurrent = m_pCurrent->m_psig;
+           // Do increment of "this" value
+           return temp ;
+        }
+
+        Lista & operator--() // --A
+        {
+            // Do increment of "this" value
+            Nodo<T>* aux;
+            aux = m_phead;
+            while ((aux->m_psig)!=m_pCurrent)
+            {
+                aux = aux->m_psig;
+            }
+            m_pCurrent = aux;
+            return m_pCurrent;
+            return *this ;
+        }
+
+        Lista operator--(int) // A--
+        {
+           T temp = *this ;
+           // Do increment of "this" value
+           Nodo<T>* aux;
+           aux = m_phead;
+           while ((aux->m_psig)!=m_pCurrent)
+           {
+               aux = aux->m_psig;
+           }
+           m_pCurrent = aux;
+           return m_pCurrent;
+           return temp ;
+        }
+
+        T getData()
+        {
+            return m_pCurrent->m_dato;
+        }
     private:
         Nodo<T>* m_phead;
         Nodo<T>* m_plast;
+        Nodo<T>* m_pCurrent;
 };
 
 
@@ -110,7 +190,7 @@ void Lista<T>::print_r(Nodo<T>* aux){
 }
 
 template <class T>
-Nodo<T>* Lista<T>::getHead(){
+Nodo<T>*& Lista<T>::getHead(){
     return m_phead;
 }
 

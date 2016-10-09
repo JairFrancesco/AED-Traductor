@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1015</width>
+    <width>1078</width>
     <height>506</height>
    </rect>
   </property>
@@ -63,6 +63,21 @@
         </property>
         <item>
          <property name="text">
+          <string>Lista</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Cola</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Pila</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Arbol Binario sin Balancear</string>
          </property>
         </item>
@@ -78,17 +93,12 @@
         </item>
         <item>
          <property name="text">
-          <string>Cola</string>
+          <string>Binomial Heap</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Pila</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Lista</string>
+          <string>Fibonacci Heap</string>
          </property>
         </item>
        </widget>
@@ -147,7 +157,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit"/>
+           <widget class="QLineEdit" name="txtPalabra"/>
           </item>
          </layout>
         </item>
@@ -161,7 +171,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox"/>
+           <widget class="QSpinBox" name="spbRadio"/>
           </item>
          </layout>
         </item>
@@ -293,7 +303,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1015</width>
+     <width>1078</width>
      <height>25</height>
     </rect>
    </property>

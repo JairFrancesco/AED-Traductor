@@ -1,10 +1,8 @@
-#include <string>
+#include <string.h>
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
-int levenshtein(const string &s1, const string &s2)
+int distanciaLevenshtein(const string &s1, const string &s2)
 {
    int N1 = s1.size();
    int N2 = s2.size();

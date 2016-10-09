@@ -22,7 +22,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStandardItem>
-#include <palabra.h>
+#include <levenshtein.h>
 
 using namespace std;
 
@@ -212,21 +212,6 @@ void GUI4::color1(QAction* color)
   qVTKGrafico->update();
 }
 
-/*
-void GUI4::color2(QAction* color)
-{
-  if(color->text() == "Background White")
-    this->Ren2->SetBackground(1,1,1);
-  else if(color->text() == "Background Black")
-    this->Ren2->SetBackground(0,0,0);
-  else if(color->text() == "Stereo Rendering")
-  {
-    this->Ren2->GetRenderWindow()->SetStereoRender(!this->Ren2->GetRenderWindow()->GetStereoRender());
-  }
-  qVTK2->update();
-}
-*/
-
 
 void GUI4::on_pushButton_clicked()
 {
@@ -248,12 +233,44 @@ void GUI4::on_cbTipoEd_currentIndexChanged(int index)
     msgBox->setWindowTitle("Mensaje de prueba");
     if (index==0)
     {
-        msgBox->setText("Ha Seleccionado Red-Black");
+        msgBox->setText("Ha Seleccionado Lista");
         msgBox->show();
+        estructuraSeleccionada = List;
     } else if (index==1)
+    {
+        msgBox->setText("Ha Seleccionado Cola");
+        msgBox->show();
+        estructuraSeleccionada = Cola;
+    } else if (index==2)
+    {
+        msgBox->setText("Ha Seleccionado Pila");
+        msgBox->show();
+        estructuraSeleccionada = Pila;
+    } else if (index==3)
+    {
+        msgBox->setText("Arbol Binario sin Balancear");
+        msgBox->show();
+        estructuraSeleccionada = BST;
+    } else if (index==4)
     {
         msgBox->setText("Ha Seleccionado AVL");
         msgBox->show();
+        estructuraSeleccionada = AVL;
+    } else if (index==5)
+    {
+        msgBox->setText("Ha Seleccionado Red-Black");
+        msgBox->show();
+        estructuraSeleccionada = RedBlack;
+    } else if (index==6)
+    {
+        msgBox->setText("Ha Seleccionado Binomial Heap");
+        msgBox->show();
+        estructuraSeleccionada = BinomialHeap;
+    } else if (index==7)
+    {
+        msgBox->setText("Ha Seleccionado Fibonacci Heap");
+        msgBox->show();
+        estructuraSeleccionada = FibonacciHeap;
     } else
     {
         msgBox->setText("Ha Seleccionado otros");
@@ -267,11 +284,6 @@ void GUI4::on_btnSeleccionarArchivo_clicked()
     if (!fileName.isEmpty())
     {
         txtRutaArchivo->setText(fileName);
-        //Cargar palabras al arbol y calcular tiempo de carga
-        //cargarDatos(fileName);
-
-        //Cargar palabras al fib heap y calcular tiempo de carga
-        cargarDatosHeap(fileName);
     }
     else
     {
@@ -279,65 +291,13 @@ void GUI4::on_btnSeleccionarArchivo_clicked()
     }
 }
 
-//Para fibonacci Heap
-void GUI4::cargarDatosHeap(QString _rutaArchivo)
-{
-    string rutaArchivo = _rutaArchivo.toUtf8().constData();
-    std::string line;
-    //RBTree<Palabra> *arbol = new RBTree<Palabra>();
-    Fheap<Palabra>* fibHeap = new Fheap<Palabra>();
-    ifstream myfile (rutaArchivo.c_str());
-
-    QTime myTimer;
-    myTimer.start();
-    string idioma1;
-    string idioma2;
-
-    string::size_type pos;
-    int rowCount = 0;
-    if (myfile.is_open())
-    {
-      while (getline (myfile,line))
-      {
-          if (line.substr(0,1)!="#") //Evitar las lineas comentadas
-          {
-              pos=line.find("\t", 0);
-              if (pos>0) //Si es menor, entonces no hay tabs
-              {
-                  idioma1 = line.substr(0,pos);
-                  idioma2 = line.substr(pos+1);
-
-                  // Esta parte es para agregar los elementos a la tabla
-                  QString item1 = QString::fromStdString(idioma1);
-                  QString item2 = QString::fromStdString(idioma2);
-                  model->setItem(rowCount,0, new QStandardItem(item1));
-                  model->setItem(rowCount,1, new QStandardItem(item2));
-
-                  cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
-                  Palabra p(idioma1, idioma2);
-                  fibHeap->insertar(p);
-                  //this->model->setRowCount(this->model->rowCount()+1);
-              }
-              rowCount++;
-          }
-      }
-      myfile.close();
-    }
-    else QMessageBox::information(0, "error, No se pudo abrir el archivo", QString("Error"));
-    int nMilliseconds = myTimer.elapsed();
-    QString s = QString::number(nMilliseconds);
-    txtTiempoCarga->setText(s);
-    tblDiccionario->setModel(this->model);
-}
-
-
 
 //Por el momento funciona solo con Red-Black Tree
-void GUI4::cargarDatos(QString _rutaArchivo)
+void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
 {
   string rutaArchivo = _rutaArchivo.toUtf8().constData();
   std::string line;
-  RBTree<Palabra> *arbol = new RBTree<Palabra>();
+
   ifstream myfile (rutaArchivo.c_str());
 
   QTime myTimer;
@@ -359,14 +319,23 @@ void GUI4::cargarDatos(QString _rutaArchivo)
                 idioma1 = line.substr(0,pos);
                 idioma2 = line.substr(pos+1);
 
+                //Esto es para agregar las palabras a la tabla
                 QString item1 = QString::fromStdString(idioma1);
                 QString item2 = QString::fromStdString(idioma2);
                 model->setItem(rowCount,0, new QStandardItem(item1));
                 model->setItem(rowCount,1, new QStandardItem(item2));
                 cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
+
                 Palabra p(idioma1, idioma2);
-                arbol->insertar(p);
-                //this->model->setRowCount(this->model->rowCount()+1);
+                //Se inserta segun la estructura
+                if (estructuraSeleccionada == List)
+                {
+                    lista->pushBack(p);
+                }
+                else if (estructuraSeleccionada == RedBlack)
+                {
+                    arbol->insertar(p);
+                }
             }
             rowCount++;
         }
@@ -378,4 +347,54 @@ void GUI4::cargarDatos(QString _rutaArchivo)
   QString s = QString::number(nMilliseconds);
   txtTiempoCarga->setText(s);
   tblDiccionario->setModel(this->model);
+}
+
+void GUI4::on_btnCargar_clicked()
+{
+    //Cargar palabras al arbol y calcular tiempo de carga
+    //cargarDatos(fileName);
+
+    //Cargar palabras al fib heap y calcular tiempo de carga
+    QString fileName = txtRutaArchivo->text();
+    cargarDatosaEstructura(fileName);
+}
+
+void GUI4::on_btnBuscar_clicked()
+{
+    model->clear();
+    //Esto es para la busqueda
+    lista->begin();
+    int rowCount = 0;
+    // Either this if you use UTF-8 anywhere
+    std::string palabra = (txtPalabra->text()).toUtf8().constData();
+    cout<<"Palabra:"<<palabra<<endl;
+    int radio = spbRadio->value();
+    cout<<"Radio de busqueda:"<<radio<<endl;
+
+    QTime tiempoBusqueda;
+    tiempoBusqueda.start();
+
+    for (;!lista->terminate();lista->next())
+    {
+        cout<<"IMPL:"<<lista->getData().idioma1<<endl;
+        if (distanciaLevenshtein(lista->getData().idioma1, palabra) <= radio
+            || distanciaLevenshtein(lista->getData().idioma2, palabra) <= radio)
+        {
+            //Estoes para agregarlos a la tabla
+            string idioma1 = lista->getData().idioma1;
+            string idioma2 = lista->getData().idioma2;
+
+            //Esto es para agregar las palabras a la tabla
+            QString item1 = QString::fromStdString(idioma1);
+            QString item2 = QString::fromStdString(idioma2);
+            model->setItem(rowCount,0, new QStandardItem(item1));
+            model->setItem(rowCount,1, new QStandardItem(item2));
+            rowCount++;
+        }
+
+    }
+    int nMilliseconds = tiempoBusqueda.elapsed();
+    QString s = QString::number(nMilliseconds);
+    txtTiempoBusqueda->setText(s);
+    tblDiccionario->setModel(this->model);
 }

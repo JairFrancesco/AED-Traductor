@@ -2,16 +2,21 @@
 #define _GUI_h
 
 #include <QMainWindow>
+#include <palabra.h>
 #include "ui_GUI4.h"
 #include <rbnode.h>
 #include <rbtree.h>
+#include <Lista.h>
 #include <Fheap.h>
 #include <QStandardItemModel>
+
 
 class vtkRenderer;
 class vtkEventQtSlotConnect;
 class vtkObject;
 class vtkCommand;
+
+enum Estructuras {List, Cola, Pila, BST, AVL, RedBlack, BinomialHeap, FibonacciHeap};
 
 class GUI4 : public QMainWindow, public Ui::GUI
 {
@@ -19,6 +24,7 @@ class GUI4 : public QMainWindow, public Ui::GUI
 public:
   GUI4();
   ~GUI4();
+  QStandardItemModel *model = new QStandardItemModel();
 
 public slots:
   void updateCoords(vtkObject*);
@@ -26,19 +32,23 @@ public slots:
              void * client_data, void *,
              vtkCommand * command);
   void color1(QAction*);
-  void cargarDatos(QString _rutaArchivo);
-  void cargarDatosHeap(QString _rutaArchivo);
+  void cargarDatosaEstructura(QString _rutaArchivo);
   //void color2(QAction*);
 
+
 protected:
+  Lista<Palabra> *lista = new Lista<Palabra>();
+  RBTree<Palabra> *arbol = new RBTree<Palabra>();
+  Estructuras estructuraSeleccionada;
   vtkRenderer* Renderizador;
-  QStandardItemModel *model = new QStandardItemModel();
   //vtkRenderer* Ren2;
   vtkEventQtSlotConnect* Connections;
 private slots:
   void on_pushButton_clicked();
   void on_cbTipoEd_currentIndexChanged(int index);
   void on_btnSeleccionarArchivo_clicked();
+  void on_btnCargar_clicked();
+  void on_btnBuscar_clicked();
 };
 
 #endif // _GUI_h
