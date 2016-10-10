@@ -68,16 +68,6 @@
         </item>
         <item>
          <property name="text">
-          <string>Cola</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Pila</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
           <string>Arbol Binario sin Balancear</string>
          </property>
         </item>

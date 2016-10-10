@@ -2,6 +2,7 @@
 #define SEARCHSTRUCTURE_H
 #include <palabra.h>
 
+int distanciaLevenshtein(const string& , const string& );
 
 class SearchStructure
 {

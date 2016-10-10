@@ -1,5 +1,5 @@
-#ifndef NODO_H
-#define NODO_H
+#ifndef NODOARBOL_H
+#define NODOARBOL_H
 
 template <class T>
 class NodoA
@@ -20,4 +20,4 @@ class NodoA
 
 };
 
-#endif // NODO_H
+#endif // NODOARBOL_H

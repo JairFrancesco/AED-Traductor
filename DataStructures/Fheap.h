@@ -100,8 +100,6 @@ void Fheap<T>::insertarpalabra(Palabra pal)
         res=reso;
     }
 
-
-
 }
 
 template <class T>
@@ -200,9 +198,9 @@ void Fheap<T>::decrease_key(NodoF<T>*& a, T d)
 template <class T>
 void Fheap<T>::compactar()
 {
-    int a=log2(raices.size());
+    int a=raices.size();
     std::vector<NodoF<T>*> v;
-    for (int i=0;i<a+1;i++)
+    for (int i=0;i<10;i++)
     {
         v.push_back(0);
     }
@@ -330,6 +328,7 @@ void Fheap<T>::insertar(T d)
         raices.insert(minimo,nuevo);
         if ((*minimo)->valor>=d) minimo--;
     }
+    compactar();
     //ver_raices();
     //std::cout<<"Por ahora el minimo es: "<<(*minimo)->valor<<std::endl;
 }

@@ -8,8 +8,10 @@
 #include <Lista.h>
 #include <Fheap.h>
 #include <NodoF.h>
+#include <AVL.h>
 //#include <nodofibonacci.h>
 #include <QStandardItemModel>
+
 //#include <fibonacci.h>
 
 
@@ -18,7 +20,7 @@ class vtkEventQtSlotConnect;
 class vtkObject;
 class vtkCommand;
 
-enum Estructuras {List, Cola, Pila, BST, AVL, RedBlack, BinomialHeap, FibonacciHeap};
+enum Estructuras {List, Cola, Pila, BST, Avl, RedBlack, BinomialHeap, FibonacciHeap};
 
 class GUI4 : public QMainWindow, public Ui::GUI
 {
@@ -40,9 +42,11 @@ public slots:
 
 
 protected:
-  Lista<Palabra> *lista = new Lista<Palabra>();
-  RBTree<Palabra> *arbol = new RBTree<Palabra>();
+  Lista<Palabra> *lista;
+  RBTree<Palabra> *arbol;
+  AVL<Palabra> * avl;
   Fheap<int> *fheap = new Fheap<int>();
+
   Estructuras estructuraSeleccionada;
   vtkRenderer* Renderizador;
   //vtkRenderer* Ren2;

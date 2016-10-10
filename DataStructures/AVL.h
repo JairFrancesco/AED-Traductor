@@ -1,6 +1,6 @@
 #ifndef AVL_H
 #define AVL_H
-#include "NodoArbol.h"
+#include <NodoArbol.h>
 
 template<class T>
 class AVL
@@ -47,7 +47,7 @@ void AVL<T>::balancear(NodoA<T>*& h)
             }
             else
             {
-                rdi(aux,false);
+                //rdi(aux,false);
                 rdd(aux,false);
             }
         }
