@@ -3,7 +3,7 @@
 #include <NodoArbol.h>
 
 template<class T>
-class AVL
+class AVL 
 {
     public:
         AVL()

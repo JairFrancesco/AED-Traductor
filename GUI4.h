@@ -11,7 +11,7 @@
 #include <AVL.h>
 //#include <nodofibonacci.h>
 #include <QStandardItemModel>
-
+#include <searchstructure.h>
 //#include <fibonacci.h>
 
 
@@ -48,6 +48,7 @@ protected:
   Fheap<int> *fheap = new Fheap<int>();
 
   Estructuras estructuraSeleccionada;
+  SearchStructure* estructura;
   vtkRenderer* Renderizador;
   //vtkRenderer* Ren2;
   vtkEventQtSlotConnect* Connections;

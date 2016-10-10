@@ -19,7 +19,7 @@ class Lista : public SearchStructure
         void find(T d, Nodo<T>* p);
         void Add(T d,Nodo<T>*& p);
         void insertar(Palabra d);
-        std::vector<Palabra> find(Palabra d);
+        std::vector<Palabra> find(Palabra d, int radio);
         void pushBack(T d);
         void print();
         void max_r(Nodo<T>* aux, T maximum);
@@ -27,10 +27,21 @@ class Lista : public SearchStructure
         void intersection(Lista<T>* L2);
         Nodo<T>*& getHead();
         void print_r(Nodo<T>* aux);
-        Nodo<T>* begin()
+        /*Nodo<T>* begin()
         {
             m_pCurrent = m_phead;
             return m_phead;
+        }*/
+        void begin()
+        {
+            m_pCurrent= m_phead;
+        }
+
+
+        void next()
+        {
+            if (!m_pCurrent->m_psig) return ;
+            m_pCurrent= m_pCurrent->m_psig;
         }
         Nodo<T>* end()
         {
@@ -50,12 +61,12 @@ class Lista : public SearchStructure
             m_pCurrent = aux;
             return m_pCurrent;
         }
-        Nodo<T>* next()
+        /*Nodo<T>* next()
         {
             if (!m_pCurrent->m_psig) return 0;
             m_pCurrent = m_pCurrent->m_psig;
-        }
-        Lista & operator++() // ++A
+        }*/
+        /*Lista & operator++() // ++A
         {
             // Do increment of "this" value
             if (!m_pCurrent->m_psig) return;
@@ -100,7 +111,7 @@ class Lista : public SearchStructure
            return m_pCurrent;
            return temp ;
         }
-
+*/
         T getData()
         {
             return m_pCurrent->m_dato;
@@ -112,14 +123,15 @@ class Lista : public SearchStructure
 };
 
 template<class T>
-std::vector<Palabra> Lista<T>::find(Palabra d)
+std::vector<Palabra> Lista<T>::find(Palabra d,int radio)
 {
     Nodo<T>* aux= m_phead;
     std::vector<Palabra> v;
     while (aux)
     {
-        if (aux->m_dato==d)
+        if (aux->m_dato==d || distanciaLevenshtein(aux->m_dato.idioma1,d.idioma1)<=radio)
             v.push_back(aux->m_dato);
+
         aux=aux->m_psig;
     }
     return v;

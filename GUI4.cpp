@@ -123,6 +123,7 @@ GUI4::GUI4()
     this->avl=0;
     estructuraSeleccionada =List;
    this->lista=new Lista<Palabra>;
+    estructura=new Lista<Palabra>;
  }
 
 GUI4::~GUI4()
@@ -226,6 +227,7 @@ void GUI4::on_cbTipoEd_currentIndexChanged(int index)
         msgBox->show();
         estructuraSeleccionada = List;
         this->lista=new Lista<Palabra>;
+        estructura=new Lista<Palabra>;
 
     } else if (index==1)
     {
@@ -239,12 +241,14 @@ void GUI4::on_cbTipoEd_currentIndexChanged(int index)
         msgBox->show();
         estructuraSeleccionada = Avl;
         this->avl=new AVL<Palabra>;
+        //estructura=new AVL<Palabra>;
     } else if (index==3)
     {
         msgBox->setText("Ha Seleccionado Red-Black");
         msgBox->show();
         estructuraSeleccionada = RedBlack;
         this->arbol= new RBTree<Palabra>;
+        //estructura=new RBTree<Palabra>;
     } else if (index==4)
     {
         msgBox->setText("Ha Seleccionado Binomial Heap");
@@ -331,14 +335,15 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
           Palabra p(pala, v);
           //Se inserta segun la estructura
           
-          if (estructuraSeleccionada == List)
+          /*if (estructuraSeleccionada == List)
           {
               lista->insertar(p);
           }
           else if (estructuraSeleccionada == RedBlack)
           {
               arbol->insertar(p);
-          }
+          }*/
+          estructura->insertar(p);
           pala=idioma1;
           v.clear();
 
@@ -506,7 +511,7 @@ void GUI4::on_btnBuscar_clicked()
 {
     model->clear();
     //Esto es para la busqueda
-    lista->begin();
+    estructura->begin();
     int rowCount = 0;
     // Either this if you use UTF-8 anywhere
     std::string palabra = (txtPalabra->text()).toUtf8().constData();
@@ -516,25 +521,28 @@ void GUI4::on_btnBuscar_clicked()
 
     QTime tiempoBusqueda;
     tiempoBusqueda.start();
-    cout<<"bp"<<endl<<"   "<<lista->terminate()<<endl;
+    //cout<<"bp"<<endl<<"   "<<estructura->terminate()<<endl;
     bool paso=false;
     int nMilliseconds;
-    for (;!lista->terminate();lista->next())
+
+    for (;!estructura->terminate();estructura->next())
     {
         //cout<<"IMPL:"<<lista->getData().idioma1<<endl;
         if (paso==false)
         {
-          if (lista->getData().idioma1==palabra)
+          if (estructura->getData().idioma1==palabra)
             paso=true;
             nMilliseconds=tiempoBusqueda.elapsed();
         }
-        if (distanciaLevenshtein(lista->getData().idioma1, palabra) <= radio)
+
+
+        if (distanciaLevenshtein(estructura->getData().idioma1, palabra) <= radio)
             //|| distanciaLevenshtein(lista->getData().idioma2.at(0), palabra) <= radio)
         {
             //Estoes para agregarlos a la tabla
 
-            string idioma1 = lista->getData().idioma1;
-            vector<string> id2=lista->getData().idioma2;
+            string idioma1 = estructura->getData().idioma1;
+            vector<string> id2=estructura->getData().idioma2;
             for (std::vector<string>::iterator i=id2.begin();i!=id2.end();i++)
             {
               string idioma2 = (*i);
