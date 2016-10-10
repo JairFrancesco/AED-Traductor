@@ -283,6 +283,7 @@ void GUI4::on_btnSeleccionarArchivo_clicked()
 //Por el momento funciona solo con Red-Black Tree
 void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
 {
+  fheap = new Fheap<int>();
   string rutaArchivo = _rutaArchivo.toUtf8().constData();
   std::string line;
 
@@ -333,6 +334,7 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
               rowCount++;
           }
           Palabra p(pala, v);
+          fheap->insertarpalabra(p);
           //Se inserta segun la estructura
           
           /*if (estructuraSeleccionada == List)
@@ -364,7 +366,7 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
   tblDiccionario->setModel(this->model);  
 }
 
-void GUI4::graficarHeap(std::list<NodoF<int>*> listaNodos,double xpos = 0.0, double ypos = 0.0, double zpos = 0.0, bool esHijo = false)
+void GUI4::graficarHeap(std::list<NodoF<int>*> listaNodos,double xpos = 0.0, double ypos = 0.0, double zpos = 0.0, bool esHijo = false,int gradoPadre = 0)
 {
     double radioEsfera = 0.5;
     int grosorArista = 2;
@@ -375,17 +377,20 @@ void GUI4::graficarHeap(std::list<NodoF<int>*> listaNodos,double xpos = 0.0, dou
     vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     sphereMapper->SetInputConnection(sphere->GetOutputPort());
 
-    //double xpos, ypos,zpos = 0.0;
-    //Imprimir las raices
-    //fheap->ver_raices();
+
     double puntoOrigen[3] = {xpos, ypos, zpos};
-    double puntoDestino[3] = {xpos, ypos, zpos};
     if (esHijo)
     {
-        puntoDestino[0] = xpos;
-        puntoDestino[1] = ypos-radioEsfera*4;
-        puntoDestino[2] = zpos;
+        ypos = ypos-radioEsfera*5;
+        if (gradoPadre>1)
+        {
+            xpos-=gradoPadre*radioEsfera;
+        }
+        //puntoDestino[0] = xpos;
+        //puntoDestino[1] = ypos-radioEsfera*4;
+        //puntoDestino[2] = zpos;
     }
+    double puntoDestino[3] = {xpos, ypos, zpos};
 
     //std::list<NodoF<int>* > raices = fheap->getRaices();
     for (std::list<NodoF<int>*>::const_iterator iterator = listaNodos.begin(), end = listaNodos.end(); iterator != end; ++iterator) {
@@ -475,26 +480,46 @@ void GUI4::graficarHeap(std::list<NodoF<int>*> listaNodos,double xpos = 0.0, dou
         Renderizador->AddActor(linesActor);
         Renderizador->AddActor(actorVT);
 
+
         //Graficamos los hijos del nodo;
         if ((*iterator)->get_grado()>0)
         {
-            graficarHeap((*iterator)->hijos, xpos, ypos, zpos, true);
+            graficarHeap((*iterator)->hijos, xpos, ypos, zpos, true, ((*iterator)->get_grado()>1 ? (*iterator)->get_grado():0));
         }
-        puntoOrigen[0] = xpos+radioEsfera;
-        puntoOrigen[1] = ypos;
-        puntoOrigen[2] = zpos;
-        puntoDestino[0] = xpos+(radioEsfera*3)*((*iterator)->get_grado()>0 ? (*iterator)->get_grado():1); //Agregamos mas espacio segun la cantidad de hijos
+
+        if (!esHijo)
+        {
+            puntoOrigen[0] = xpos+radioEsfera;
+            puntoOrigen[1] = ypos;
+            puntoOrigen[2] = zpos;
+        }
+
+        //puntoDestino[0] = xpos+(radioEsfera*3)*((*iterator)->get_grado()>0 ? (*iterator)->get_grado():1); //Agregamos mas espacio segun la cantidad de hijos
+
+        int sumaGradosHijos = 0;
+        for (std::list<NodoF<int>*>::const_iterator iteratorhijos = (*iterator)->hijos.begin(), end = (*iterator)->hijos.end(); iteratorhijos != end; ++iteratorhijos) {
+            sumaGradosHijos+=(*iteratorhijos)->get_grado();
+        }
+
+
+        if (!esHijo)
+        {
+            xpos += radioEsfera*5*(sumaGradosHijos>0 ? sumaGradosHijos*(*iterator)->get_grado():1);
+        }
+        else
+        {
+            //xpos += radioEsfera*5*((*iterator)->get_grado()>0 ? (*iterator)->get_grado():1);
+            xpos += radioEsfera*5*(sumaGradosHijos>0 ? sumaGradosHijos*(*iterator)->get_grado():1);
+        }
+
+
+        puntoDestino[0] = xpos;
         puntoDestino[1] = ypos;
         puntoDestino[2] = zpos;
-        xpos += radioEsfera*4*((*iterator)->get_grado()>0 ? (*iterator)->get_grado():1);
     }
-    //Renderizador->GetActiveCamera()->SetFocalPoint(0,0,0);
-    //Renderizador->GetActiveCamera()->SetPosition(0,0,1);
-    //Renderizador->GetActiveCamera()->SetViewUp(0,1,0);
-    //Renderizador->GetActiveCamera()->ParallelProjectionOn();
     Renderizador->ResetCamera();
-    //Renderizador->GetActiveCamera()->SetParallelScale(1.5);
 }
+
 
 void GUI4::on_btnCargar_clicked()
 {
@@ -504,7 +529,7 @@ void GUI4::on_btnCargar_clicked()
     //Cargar palabras al fib heap y calcular tiempo de carga
     QString fileName = txtRutaArchivo->text();
     cargarDatosaEstructura(fileName);
-    //graficarHeap(fheap->getRaices());
+    graficarHeap(fheap->getRaices());
 }
 
 void GUI4::on_btnBuscar_clicked()

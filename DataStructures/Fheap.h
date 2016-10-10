@@ -87,6 +87,8 @@ void Fheap<T>::insertarpalabra(Palabra pal)
         i++;
     }
     int reso=res;
+    insertar(reso);
+    /*
     for (std::vector<string>::iterator it=pal.idioma2.begin();it!=pal.idioma2.end();it++)
     {
 
@@ -99,7 +101,7 @@ void Fheap<T>::insertarpalabra(Palabra pal)
         insertar(res);
         res=reso;
     }
-
+    */
 }
 
 template <class T>

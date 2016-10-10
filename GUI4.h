@@ -10,10 +10,8 @@
 #include <Fheap.h>
 #include <NodoF.h>
 #include <AVL.h>
-//#include <nodofibonacci.h>
 #include <QStandardItemModel>
 #include <searchstructure.h>
-//#include <fibonacci.h>
 
 
 class vtkRenderer;
@@ -37,7 +35,7 @@ public slots:
              void * client_data, void *,
              vtkCommand * command);
   void color1(QAction*);
-  void graficarHeap(std::list<NodoF<int>*>, double, double, double, bool);
+  void graficarHeap(std::list<NodoF<int>*>, double, double, double, bool, int);
   void cargarDatosaEstructura(QString _rutaArchivo);
   //void color2(QAction*);
 
