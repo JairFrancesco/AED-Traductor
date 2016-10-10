@@ -4,7 +4,7 @@
 #include <math.h>
 #include <algorithm>
 #include <vector>
-
+#include <palabra.h>
 
 
 template <class T>
@@ -44,6 +44,7 @@ class Fheap
 
         }
         void insertar(T);
+        void insertarpalabra(Palabra );
         void unir_raices(Fnodo&, Fnodo&);
         void actualizar_min();
         void borrar(NodoF<T>*&);
@@ -69,6 +70,35 @@ class Fheap
         Fiterator minimo;
 
 };
+
+template<class T>
+void Fheap<T>::insertarpalabra(Palabra pal)
+{
+    string a=pal.idioma1;
+    int i,res;
+    i=res=0;
+    while (a[i]!='\0')
+    {
+        int c=a[i];
+        res=res+c;
+        i++;
+    }
+
+    for (std::vector<string>::iterator it=pal.idioma2.begin();it!=pal.idioma2.end();it++)
+    {
+        i=0;
+        while (a[i]!='\0')
+        {
+            int c=a[i];
+            res=res+c;
+            i++;
+        }        
+    }
+
+    insertar(res);
+
+
+}
 
 template <class T>
 void Fheap<T>::split(Fiterator it, int n)
