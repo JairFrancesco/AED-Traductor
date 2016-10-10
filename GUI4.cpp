@@ -304,8 +304,8 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
   myTimer.start();
   string idioma1;
   string idioma2;
-
   string::size_type pos;
+  std::vector<string> v;
   int rowCount = 0;
   if (myfile.is_open())
   {
@@ -318,6 +318,7 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
             {
                 idioma1 = line.substr(0,pos);
                 idioma2 = line.substr(pos+1);
+                v.push_back(idioma2);
 
                 //Esto es para agregar las palabras a la tabla
                 QString item1 = QString::fromStdString(idioma1);
@@ -326,7 +327,7 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
                 model->setItem(rowCount,1, new QStandardItem(item2));
                 cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
 
-                Palabra p(idioma1, idioma2);
+                Palabra p(idioma1, v);
                 //Se inserta segun la estructura
                 if (estructuraSeleccionada == List)
                 {
@@ -336,6 +337,7 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
                 {
                     arbol->insertar(p);
                 }
+                v.clear();
             }
             rowCount++;
         }
@@ -378,11 +380,11 @@ void GUI4::on_btnBuscar_clicked()
     {
         cout<<"IMPL:"<<lista->getData().idioma1<<endl;
         if (distanciaLevenshtein(lista->getData().idioma1, palabra) <= radio
-            || distanciaLevenshtein(lista->getData().idioma2, palabra) <= radio)
+            || distanciaLevenshtein(lista->getData().idioma2.at(0), palabra) <= radio)
         {
             //Estoes para agregarlos a la tabla
             string idioma1 = lista->getData().idioma1;
-            string idioma2 = lista->getData().idioma2;
+            string idioma2 = lista->getData().idioma2.at(0);
 
             //Esto es para agregar las palabras a la tabla
             QString item1 = QString::fromStdString(idioma1);
