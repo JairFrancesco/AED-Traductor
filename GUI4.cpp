@@ -305,41 +305,67 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
   string idioma1;
   string idioma2;
   string::size_type pos;
+  string pala;
   std::vector<string> v;
   int rowCount = 0;
+ 
   if (myfile.is_open())
   {
-    while (getline (myfile,line))
+    getline(myfile,line);
+    pos=line.find("\t",0);
+    idioma1=line.substr(0,pos);
+    pala=idioma1;
+    cout<<endl<<"ya va a entrar"<<endl;
+    while (idioma1!="")
     {
+        cout<<endl<<"ya va a entrar"<<endl;
         if (line.substr(0,1)!="#") //Evitar las lineas comentadas
         {
-            pos=line.find("\t", 0);
-            if (pos>0) //Si es menor, entonces no hay tabs
-            {
-                idioma1 = line.substr(0,pos);
-                idioma2 = line.substr(pos+1);
-                v.push_back(idioma2);
+          while(idioma1==pala) 
+          {
+          
+              if (pos>0) //Si es menor, entonces no hay tabs
+              {
 
-                //Esto es para agregar las palabras a la tabla
-                QString item1 = QString::fromStdString(idioma1);
-                QString item2 = QString::fromStdString(idioma2);
-                model->setItem(rowCount,0, new QStandardItem(item1));
-                model->setItem(rowCount,1, new QStandardItem(item2));
-                cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
+                  idioma2 = line.substr(pos+1);
+                  
 
-                Palabra p(idioma1, v);
-                //Se inserta segun la estructura
-                if (estructuraSeleccionada == List)
-                {
-                    lista->pushBack(p);
-                }
-                else if (estructuraSeleccionada == RedBlack)
-                {
-                    arbol->insertar(p);
-                }
-                v.clear();
-            }
-            rowCount++;
+                  //Esto es para agregar las palabras a la tabla
+                  QString item1 = QString::fromStdString(idioma1);
+                  QString item2 = QString::fromStdString(idioma2);
+                  model->setItem(rowCount,0, new QStandardItem(item1));
+                  model->setItem(rowCount,1, new QStandardItem(item2));
+                  cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
+
+                  v.push_back(idioma2);
+                  pala=idioma1;
+                  getline(myfile,line);
+                  pos=line.find("\t",0);
+                  idioma1=line.substr(0,pos);
+              }
+
+              rowCount++;
+          }
+          Palabra p(pala, v);
+          //Se inserta segun la estructura
+          
+          if (estructuraSeleccionada == List)
+          {
+              lista->pushBack(p);
+          }
+          else if (estructuraSeleccionada == RedBlack)
+          {
+              arbol->insertar(p);
+          }
+          pala=idioma1;
+          v.clear();
+
+        }
+        else 
+        {
+          getline(myfile,line);
+          pos=line.find("\t",0);
+          idioma1=line.substr(0,pos);
         }
     }
     myfile.close();
@@ -376,7 +402,7 @@ void GUI4::on_btnBuscar_clicked()
     QTime tiempoBusqueda;
     tiempoBusqueda.start();
 
-    for (;!lista->terminate();lista->next())
+    /*for (;!lista->terminate();lista->next())
     {
         cout<<"IMPL:"<<lista->getData().idioma1<<endl;
         if (distanciaLevenshtein(lista->getData().idioma1, palabra) <= radio
@@ -394,7 +420,10 @@ void GUI4::on_btnBuscar_clicked()
             rowCount++;
         }
 
-    }
+    }*/
+
+    
+
     int nMilliseconds = tiempoBusqueda.elapsed();
     QString s = QString::number(nMilliseconds);
     txtTiempoBusqueda->setText(s);

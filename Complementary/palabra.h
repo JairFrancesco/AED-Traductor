@@ -11,17 +11,18 @@ class Palabra
     public:
         Palabra(){}
         Palabra(string idm1, std::vector<string> idm2):idioma1(idm1), idioma2(idm2){}
+        Palabra(string idm1):idioma1(idm1){}
         string idioma1;
         std::vector<string> idioma2;
         bool operator==(Palabra &p2)
         {
-            return (this->idioma1 == p2.idioma1 && this->idioma2.at(0) == p2.idioma2.at(0));
+            return (this->idioma1 == p2.idioma1);
         }
         bool operator!=(Palabra &p2){
-            return (this->idioma1 != p2.idioma1 && this->idioma2.at(0) != p2.idioma2.at(0));
+            return (this->idioma1 != p2.idioma1);
         }
         bool operator<(Palabra &p2){
-            if ((this->idioma1).compare(p2.idioma1)<0 && (this->idioma2.at(0)).compare(p2.idioma2.at(0))<0)
+            if ((this->idioma1).compare(p2.idioma1)<0 )
             {
                 return true;
             }
@@ -29,7 +30,7 @@ class Palabra
         }
 
         bool operator>(Palabra &p2){
-            if ((this->idioma1).compare(p2.idioma1)>0 && (this->idioma2.at(0)).compare(p2.idioma2.at(0))>0)
+            if ((this->idioma1).compare(p2.idioma1)>0 )
             {
                 return true;
             }
@@ -37,7 +38,7 @@ class Palabra
         }
 
         bool operator<=(Palabra &p2){
-            if ((this->idioma1).compare(p2.idioma1)>=0 && (this->idioma2.at(0)).compare(p2.idioma2.at(0))>=0)
+            if ((this->idioma1).compare(p2.idioma1)>=0 )
             {
                 return true;
             }
@@ -45,7 +46,7 @@ class Palabra
         }
 
         bool operator>=(Palabra &p2){
-            if ((this->idioma1).compare(p2.idioma1)<=0 && (this->idioma2.at(0)).compare(p2.idioma2.at(0))<=0)
+            if ((this->idioma1).compare(p2.idioma1)<=0 )
             {
                 return true;
             }
