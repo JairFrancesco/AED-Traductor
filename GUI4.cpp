@@ -103,7 +103,7 @@ GUI4::GUI4()
     light->SetPosition(0.875,1.6125,1);
     Renderizador->AddLight(light);
 
-
+    /*
     //Esto es para probar el fibonacci heap
     fheap = new Fheap<int>();
     fheap->insertar(15);
@@ -116,6 +116,7 @@ GUI4::GUI4()
     fheap->insertar(4);
     fheap->insertar(13);
     fheap->insertar(24);
+    */
 
     //fheap->mostrar();
     this->lista=0;
@@ -284,6 +285,7 @@ void GUI4::on_btnSeleccionarArchivo_clicked()
 void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
 {
   fheap = new Fheap<int>();
+  bheap = new Bheap<int>();
   string rutaArchivo = _rutaArchivo.toUtf8().constData();
   std::string line;
 
@@ -334,17 +336,18 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
               rowCount++;
           }
           Palabra p(pala, v);
-          fheap->insertarpalabra(p);
-          //Se inserta segun la estructura
-          
-          /*if (estructuraSeleccionada == List)
+
+          //Se inserta segun el heap seleccionado
+
+          if (estructuraSeleccionada == FibonacciHeap)
           {
-              lista->insertar(p);
+              fheap->insertarpalabra(p);
           }
-          else if (estructuraSeleccionada == RedBlack)
+          else if (estructuraSeleccionada == BinomialHeap)
           {
-              arbol->insertar(p);
-          }*/
+              bheap->insertarpalabra(p);
+          }
+
           estructura->insertar(p);
           pala=idioma1;
           v.clear();
@@ -520,6 +523,161 @@ void GUI4::graficarHeap(std::list<NodoF<int>*> listaNodos,double xpos = 0.0, dou
     Renderizador->ResetCamera();
 }
 
+//Graficar Bheap
+void GUI4::graficarbHeap(std::list<NodoBHeap<int>*> listaNodos,double xpos = 0.0, double ypos = 0.0, double zpos = 0.0, bool esHijo = false,int gradoPadre = 0)
+{
+    double radioEsfera = 0.5;
+    int grosorArista = 2;
+    vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+    sphere->SetThetaResolution(100);
+    sphere->SetPhiResolution(50);
+    sphere->SetRadius(radioEsfera);
+    vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    sphereMapper->SetInputConnection(sphere->GetOutputPort());
+
+
+    double puntoOrigen[3] = {xpos, ypos, zpos};
+    if (esHijo)
+    {
+        ypos = ypos-radioEsfera*5;
+        if (gradoPadre>1)
+        {
+            xpos-=gradoPadre*radioEsfera;
+        }
+        //puntoDestino[0] = xpos;
+        //puntoDestino[1] = ypos-radioEsfera*4;
+        //puntoDestino[2] = zpos;
+    }
+    double puntoDestino[3] = {xpos, ypos, zpos};
+
+    //std::list<NodoBHeap<int>* > raices = fheap->getRaices();
+    for (std::list<NodoBHeap<int>*>::const_iterator iterator = listaNodos.begin(), end = listaNodos.end(); iterator != end; ++iterator) {
+        //Esto es para imprimir las raices
+        std::cout << (*iterator)->m_Dato;
+
+        //Esto es para graficar las raices con VTK;
+        vtkSmartPointer<vtkActor> nodoEsfera = vtkSmartPointer<vtkActor>::New();
+          nodoEsfera->SetMapper(sphereMapper);
+          nodoEsfera->GetProperty()->SetColor(1,0,0);
+          nodoEsfera->GetProperty()->SetAmbient(0.3);
+          nodoEsfera->GetProperty()->SetDiffuse(0.875);
+          nodoEsfera->GetProperty()->SetSpecular(0.0);
+          nodoEsfera->GetProperty()->SetOpacity(0.5);
+          nodoEsfera->AddPosition(xpos,ypos,zpos);
+        // Create text
+        QString nodoTextoTmp = QString::number((*iterator)->m_Dato);
+        std::string nodoTexto = nodoTextoTmp.toUtf8().constData();
+        vtkSmartPointer<vtkVectorText> textSource = vtkSmartPointer<vtkVectorText>::New();
+        textSource->SetText(nodoTexto.c_str());
+        textSource->Update();
+        cout<<"Texto a mostrar en nodo:"<<nodoTexto.c_str()<<endl;
+
+        vtkSmartPointer<vtkTransform> transform =
+            vtkSmartPointer<vtkTransform>::New();
+          //transform->PostMultiply(); //this is the key line
+          transform->Scale(radioEsfera/(radioEsfera*5),radioEsfera/(radioEsfera*5),radioEsfera/(radioEsfera*5));
+
+          vtkSmartPointer<vtkTransformFilter> transformFilter =
+            vtkSmartPointer<vtkTransformFilter>::New();
+          transformFilter->SetInputConnection(textSource->GetOutputPort());
+          transformFilter->SetTransform(transform);
+
+        // Create a mapper and actor for the text
+        vtkSmartPointer<vtkPolyDataMapper> textMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        textMapper->SetInputConnection(transformFilter->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actorVT = vtkSmartPointer<vtkActor>::New();
+        actorVT->SetMapper(textMapper);
+        actorVT->GetProperty()->SetColor(255, 255, 255);
+        actorVT->AddPosition(xpos-radioEsfera/2,ypos,zpos+radioEsfera/3);
+
+        //Lo siguiente es para agregar las aristas entre nodos
+        vtkSmartPointer<vtkPoints> points =vtkSmartPointer<vtkPoints>::New();
+        points->InsertNextPoint(puntoOrigen);
+        points->InsertNextPoint(puntoDestino);
+
+        //Polylineas
+        vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
+        polyLine->GetPointIds()->SetNumberOfIds(2);
+        for(unsigned int i = 0; i < 2; i++)
+        {
+            polyLine->GetPointIds()->SetId(i,i);
+        }
+
+        // Create a cell array to store the lines in and add the lines to it
+        vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+        cells->InsertNextCell(polyLine);
+
+        // Create a polydata to store everything in
+        vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
+        // Add the points to the dataset
+        polyData->SetPoints(points);
+
+        // Add the lines to the dataset
+        polyData->SetLines(cells);
+
+        // Setup actor and mapper
+        vtkSmartPointer<vtkPolyDataMapper> linesMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+
+        #if VTK_MAJOR_VERSION <= 5
+          linesMapper->SetInput(polyData);
+        #else
+          linesMapper->SetInputData(polyData);
+        #endif
+
+
+        vtkSmartPointer<vtkActor> linesActor = vtkSmartPointer<vtkActor>::New();
+        linesActor->GetProperty()->SetColor(255, 255, 255);
+        linesActor->SetMapper(linesMapper);
+        linesActor->GetProperty()->SetLineWidth(grosorArista);
+
+
+        //Agregamos los actores al renderizador
+        Renderizador->AddActor(nodoEsfera);
+        Renderizador->AddActor(linesActor);
+        Renderizador->AddActor(actorVT);
+
+
+        //Graficamos los hijos del nodo;
+        if ((*iterator)->m_Grado>0)
+        {
+            graficarbHeap((*iterator)->m_Son, xpos, ypos, zpos, true, ((*iterator)->m_Grado>1 ? (*iterator)->m_Grado:0));
+        }
+
+        if (!esHijo)
+        {
+            puntoOrigen[0] = xpos+radioEsfera;
+            puntoOrigen[1] = ypos;
+            puntoOrigen[2] = zpos;
+        }
+
+        //puntoDestino[0] = xpos+(radioEsfera*3)*((*iterator)->get_grado()>0 ? (*iterator)->get_grado():1); //Agregamos mas espacio segun la cantidad de hijos
+
+        int sumaGradosHijos = 0;
+        for (std::list<NodoBHeap<int>*>::const_iterator iteratorhijos = (*iterator)->m_Son.begin(), end = (*iterator)->m_Son.end(); iteratorhijos != end; ++iteratorhijos) {
+            sumaGradosHijos+=(*iteratorhijos)->m_Grado;
+        }
+
+
+        if (!esHijo)
+        {
+            xpos += radioEsfera*5*(sumaGradosHijos>0 ? sumaGradosHijos*(*iterator)->m_Grado:1);
+        }
+        else
+        {
+            //xpos += radioEsfera*5*((*iterator)->get_grado()>0 ? (*iterator)->get_grado():1);
+            xpos += radioEsfera*5*(sumaGradosHijos>0 ? sumaGradosHijos*(*iterator)->m_Grado:1);
+        }
+
+
+        puntoDestino[0] = xpos;
+        puntoDestino[1] = ypos;
+        puntoDestino[2] = zpos;
+    }
+    Renderizador->ResetCamera();
+}
+
 
 void GUI4::on_btnCargar_clicked()
 {
@@ -529,7 +687,34 @@ void GUI4::on_btnCargar_clicked()
     //Cargar palabras al fib heap y calcular tiempo de carga
     QString fileName = txtRutaArchivo->text();
     cargarDatosaEstructura(fileName);
-    graficarHeap(fheap->getRaices());
+    //Se inserta segun el heap seleccionado
+
+    if (estructuraSeleccionada == FibonacciHeap)
+    {
+        if (fheap->raices.empty())
+        {
+            //Esto es para probar el fibonacci heap
+            fheap = new Fheap<int>();
+            fheap->insertar(15);
+            fheap->insertar(5);
+            fheap->insertar(9);
+            fheap->insertar(2);
+            fheap->insertar(12);
+            fheap->insertar(6);
+            fheap->insertar(8);
+            fheap->insertar(4);
+            fheap->insertar(13);
+            fheap->insertar(24);
+            fheap->insertar(100);
+            fheap->insertar(1);
+        }
+        graficarHeap(fheap->getRaices());
+    }
+    else if (estructuraSeleccionada == BinomialHeap)
+    {
+        graficarbHeap(bheap->getRaices());
+    }
+
 }
 
 void GUI4::on_btnBuscar_clicked()

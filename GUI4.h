@@ -12,6 +12,7 @@
 #include <AVL.h>
 #include <QStandardItemModel>
 #include <searchstructure.h>
+#include <BinomialHeap.h>
 
 
 class vtkRenderer;
@@ -36,6 +37,7 @@ public slots:
              vtkCommand * command);
   void color1(QAction*);
   void graficarHeap(std::list<NodoF<int>*>, double, double, double, bool, int);
+  void graficarbHeap(std::list<NodoBHeap<int>*>, double, double, double, bool, int);
   void cargarDatosaEstructura(QString _rutaArchivo);
   //void color2(QAction*);
 
@@ -45,7 +47,7 @@ protected:
   RBTree<Palabra> *arbol;
   AVL<Palabra> * avl;
   Fheap<int> *fheap = new Fheap<int>();
-
+  Bheap<int> *bheap = new Bheap<int>();
   Estructuras estructuraSeleccionada;
   SearchStructure* estructura;
   vtkRenderer* Renderizador;

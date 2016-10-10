@@ -42,6 +42,8 @@ set( Hdrs
     DataStructures/Fheap.h
     DataStructures/NodoF.h
     DataStructures/Lista.h
+    DataStructures/arbolbb.h
+    DataStructures/BinomialHeap.h
     Complementary/searchstructure.h
     Complementary/levenshtein.h)
 
@@ -51,6 +53,7 @@ set( MOC_Hdrs
     DataStructures/NodoArbol.h
     Complementary/palabra.h
     DataStructures/rbnode.h
+    DataStructures/arbolbb.h
     DataStructures/rbtree.h
     DataStructures/cola.h
     DataStructures/nodo.h
@@ -58,6 +61,7 @@ set( MOC_Hdrs
     DataStructures/Fheap.h
     DataStructures/NodoF.h
     DataStructures/Lista.h
+    DataStructures/BinomialHeap.h
     Complementary/searchstructure.h
     Complementary/levenshtein.h)
 

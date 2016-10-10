@@ -18,7 +18,6 @@ class NodoB
         }
         virtual ~NodoB(){
         }
-    protected:
     public:
         T valor;
         NodoB<T>* mpizq;
