@@ -1,5 +1,10 @@
 #include "GUI4.h"
 #include <QMenu>
+#include <vtkTransform.h>
+#include <vtkVectorText.h>
+#include <vtkTransformFilter.h>
+#include <vtkPoints.h>
+#include <vtkPolyLine.h>
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkCommand.h"
@@ -12,6 +17,8 @@
 #include "vtkTDxInteractorStyleCamera.h"
 #include "vtkTDxInteractorStyleSettings.h"
 #include "QVTKInteractor.h"
+#include "vtkProperty.h"
+#include "vtkLight.h"
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -23,6 +30,7 @@
 #include <QTextStream>
 #include <QStandardItem>
 #include <levenshtein.h>
+#include <vtkInteractorStyleRubberBandZoom.h>
 
 using namespace std;
 
@@ -71,32 +79,6 @@ GUI4::GUI4()
   popup1->addAction("Stereo Rendering");
   connect(popup1, SIGNAL(triggered(QAction*)), this, SLOT(color1(QAction*)));
 
-  /*
-  // put cone in one window
-  vtkConeSource* cone = vtkConeSource::New();
-  vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(cone->GetOutputPort());
-  vtkActor* actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  Renderizador->AddViewProp(actor);
-  actor->Delete();
-  mapper->Delete();
-  cone->Delete();
-  */
-
-  // put sphere in the window
-  vtkSphereSource* sphere = vtkSphereSource::New();
-  vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-  mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(sphere->GetOutputPort());
-  vtkActor* actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  Renderizador->AddViewProp(actor);
-  actor->Delete();
-  mapper->Delete();
-  sphere->Delete();
-
-
   Connections = vtkEventQtSlotConnect::New();
 
   // get right mouse pressed with high priority
@@ -105,43 +87,37 @@ GUI4::GUI4()
                        this,
                        SLOT(popup( vtkObject*, unsigned long, void*, void*, vtkCommand*)),
                        popup1, 1.0);
-  /*
-  // get right mouse pressed with high priority
-  Connections->Connect(qVTK2->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::RightButtonPressEvent,
-                       this,
-                       SLOT(popup( vtkObject*, unsigned long, void*, void*, vtkCommand*)),
-                       popup2, 1.0);
-  */
 
-  /*
-  // connect window enter event to radio button slot
-  Connections->Connect(qVTK1->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::EnterEvent,
-                       radio1,
-                       SLOT(animateClick()));
-
-  // connect window enter event to radio button slot
-  Connections->Connect(qVTK2->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::EnterEvent,
-                       radio2,
-                       SLOT(animateClick()));
-
-  */
   // update coords as we move through the window
   Connections->Connect(qVTKGrafico->GetRenderWindow()->GetInteractor(),
                        vtkCommand::MouseMoveEvent,
                        this,
                        SLOT(updateCoords(vtkObject*)));
 
-  /*
-  // update coords as we move through the window
-  Connections->Connect(qVTK2->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::MouseMoveEvent,
-                       this,
-                       SLOT(updateCoords(vtkObject*)));
-  */
+
   Connections->PrintSelf(cout, vtkIndent());
+
+  //Set up the lighting
+  vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
+    light->SetFocalPoint(1.875,0.6125,0);
+    light->SetPosition(0.875,1.6125,1);
+    Renderizador->AddLight(light);
+
+
+    //Esto es para probar el fibonacci heap
+    fheap = new Fheap<int>();
+    fheap->insertar(15);
+    fheap->insertar(5);
+    fheap->insertar(9);
+    fheap->insertar(2);
+    fheap->insertar(12);
+    fheap->insertar(6);
+    fheap->insertar(8);
+    fheap->insertar(4);
+    fheap->insertar(13);
+    fheap->insertar(24);
+
+    //fheap->mostrar();
 }
 
 GUI4::~GUI4()
@@ -215,6 +191,8 @@ void GUI4::color1(QAction* color)
 
 void GUI4::on_pushButton_clicked()
 {
+    Renderizador->ResetCamera();
+    /*
     QMessageBox::StandardButton reply;
       reply = QMessageBox::question(this, "Test", "Quit?",
                                     QMessageBox::Yes|QMessageBox::No);
@@ -224,6 +202,8 @@ void GUI4::on_pushButton_clicked()
       } else {
         qDebug() << "Yes was *not* clicked";
       }
+
+      */
 }
 
 void GUI4::on_cbTipoEd_currentIndexChanged(int index)
@@ -328,7 +308,7 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
                 cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
 
                 Palabra p(idioma1, v);
-                fheap->insertarpalabra(p);
+                //fheap->insertarpalabra(p);
                 //Se inserta segun la estructura
                 if (estructuraSeleccionada == List)
                 {
@@ -349,8 +329,139 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
   int nMilliseconds = myTimer.elapsed();
   QString s = QString::number(nMilliseconds);
   txtTiempoCarga->setText(s);
-  tblDiccionario->setModel(this->model);
-  fheap->mostrar();
+  tblDiccionario->setModel(this->model);  
+}
+
+void GUI4::graficarHeap(std::list<NodoF<int>*> listaNodos,double xpos = 0.0, double ypos = 0.0, double zpos = 0.0, bool esHijo = false)
+{
+    double radioEsfera = 0.5;
+    int grosorArista = 2;
+    vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+    sphere->SetThetaResolution(100);
+    sphere->SetPhiResolution(50);
+    sphere->SetRadius(radioEsfera);
+    vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    sphereMapper->SetInputConnection(sphere->GetOutputPort());
+
+    //double xpos, ypos,zpos = 0.0;
+    //Imprimir las raices
+    //fheap->ver_raices();
+    double puntoOrigen[3] = {xpos, ypos, zpos};
+    double puntoDestino[3] = {xpos, ypos, zpos};
+    if (esHijo)
+    {
+        puntoDestino[0] = xpos;
+        puntoDestino[1] = ypos-radioEsfera*4;
+        puntoDestino[2] = zpos;
+    }
+
+    //std::list<NodoF<int>* > raices = fheap->getRaices();
+    for (std::list<NodoF<int>*>::const_iterator iterator = listaNodos.begin(), end = listaNodos.end(); iterator != end; ++iterator) {
+        //Esto es para imprimir las raices
+        std::cout << (*iterator)->valor;
+
+        //Esto es para graficar las raices con VTK;
+        vtkSmartPointer<vtkActor> nodoEsfera = vtkSmartPointer<vtkActor>::New();
+          nodoEsfera->SetMapper(sphereMapper);
+          nodoEsfera->GetProperty()->SetColor(1,0,0);
+          nodoEsfera->GetProperty()->SetAmbient(0.3);
+          nodoEsfera->GetProperty()->SetDiffuse(0.875);
+          nodoEsfera->GetProperty()->SetSpecular(0.0);
+          nodoEsfera->GetProperty()->SetOpacity(0.5);
+          nodoEsfera->AddPosition(xpos,ypos,zpos);
+        // Create text
+        QString nodoTextoTmp = QString::number((*iterator)->valor);
+        std::string nodoTexto = nodoTextoTmp.toUtf8().constData();
+        vtkSmartPointer<vtkVectorText> textSource = vtkSmartPointer<vtkVectorText>::New();
+        textSource->SetText(nodoTexto.c_str());
+        textSource->Update();
+        cout<<"Texto a mostrar en nodo:"<<nodoTexto.c_str()<<endl;
+
+        vtkSmartPointer<vtkTransform> transform =
+            vtkSmartPointer<vtkTransform>::New();
+          //transform->PostMultiply(); //this is the key line
+          transform->Scale(radioEsfera/(radioEsfera*5),radioEsfera/(radioEsfera*5),radioEsfera/(radioEsfera*5));
+
+          vtkSmartPointer<vtkTransformFilter> transformFilter =
+            vtkSmartPointer<vtkTransformFilter>::New();
+          transformFilter->SetInputConnection(textSource->GetOutputPort());
+          transformFilter->SetTransform(transform);
+
+        // Create a mapper and actor for the text
+        vtkSmartPointer<vtkPolyDataMapper> textMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        textMapper->SetInputConnection(transformFilter->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actorVT = vtkSmartPointer<vtkActor>::New();
+        actorVT->SetMapper(textMapper);
+        actorVT->GetProperty()->SetColor(255, 255, 255);
+        actorVT->AddPosition(xpos-radioEsfera/2,ypos,zpos+radioEsfera/3);
+
+        //Lo siguiente es para agregar las aristas entre nodos
+        vtkSmartPointer<vtkPoints> points =vtkSmartPointer<vtkPoints>::New();
+        points->InsertNextPoint(puntoOrigen);
+        points->InsertNextPoint(puntoDestino);
+
+        //Polylineas
+        vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
+        polyLine->GetPointIds()->SetNumberOfIds(2);
+        for(unsigned int i = 0; i < 2; i++)
+        {
+            polyLine->GetPointIds()->SetId(i,i);
+        }
+
+        // Create a cell array to store the lines in and add the lines to it
+        vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+        cells->InsertNextCell(polyLine);
+
+        // Create a polydata to store everything in
+        vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+
+        // Add the points to the dataset
+        polyData->SetPoints(points);
+
+        // Add the lines to the dataset
+        polyData->SetLines(cells);
+
+        // Setup actor and mapper
+        vtkSmartPointer<vtkPolyDataMapper> linesMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+
+        #if VTK_MAJOR_VERSION <= 5
+          linesMapper->SetInput(polyData);
+        #else
+          linesMapper->SetInputData(polyData);
+        #endif
+
+
+        vtkSmartPointer<vtkActor> linesActor = vtkSmartPointer<vtkActor>::New();
+        linesActor->GetProperty()->SetColor(255, 255, 255);
+        linesActor->SetMapper(linesMapper);
+        linesActor->GetProperty()->SetLineWidth(grosorArista);
+
+
+        //Agregamos los actores al renderizador
+        Renderizador->AddActor(nodoEsfera);
+        Renderizador->AddActor(linesActor);
+        Renderizador->AddActor(actorVT);
+
+        //Graficamos los hijos del nodo;
+        if ((*iterator)->get_grado()>0)
+        {
+            graficarHeap((*iterator)->hijos, xpos, ypos, zpos, true);
+        }
+        puntoOrigen[0] = xpos+radioEsfera;
+        puntoOrigen[1] = ypos;
+        puntoOrigen[2] = zpos;
+        puntoDestino[0] = xpos+(radioEsfera*3)*((*iterator)->get_grado()>0 ? (*iterator)->get_grado():1); //Agregamos mas espacio segun la cantidad de hijos
+        puntoDestino[1] = ypos;
+        puntoDestino[2] = zpos;
+        xpos += radioEsfera*4*((*iterator)->get_grado()>0 ? (*iterator)->get_grado():1);
+    }
+    //Renderizador->GetActiveCamera()->SetFocalPoint(0,0,0);
+    //Renderizador->GetActiveCamera()->SetPosition(0,0,1);
+    //Renderizador->GetActiveCamera()->SetViewUp(0,1,0);
+    //Renderizador->GetActiveCamera()->ParallelProjectionOn();
+    Renderizador->ResetCamera();
+    //Renderizador->GetActiveCamera()->SetParallelScale(1.5);
 }
 
 void GUI4::on_btnCargar_clicked()
@@ -361,6 +472,7 @@ void GUI4::on_btnCargar_clicked()
     //Cargar palabras al fib heap y calcular tiempo de carga
     QString fileName = txtRutaArchivo->text();
     cargarDatosaEstructura(fileName);
+    graficarHeap(fheap->getRaices());
 }
 
 void GUI4::on_btnBuscar_clicked()

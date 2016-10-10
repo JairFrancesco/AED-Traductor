@@ -17,9 +17,9 @@ add_compile_options(-std=c++11) # CMake 2.8.12 or newer
 project(AED_Diccionario)
 
 find_package(VTK COMPONENTS
-  vtkCommonCore
-  vtkFiltersSources
-  vtkGUISupportQt
+  #vtkCommonCore
+  #vtkFiltersSources
+  #vtkGUISupportQt
 )
 include(${VTK_USE_FILE})
 
