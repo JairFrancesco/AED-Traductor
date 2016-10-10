@@ -3,7 +3,7 @@
 #include <NodoArbol.h>
 
 template<class T>
-class AVL 
+class AVL :public SearchStructure
 {
     public:
         AVL()
@@ -21,12 +21,74 @@ class AVL
         void balancear(NodoA<T>*&);
         bool find(NodoA<T>**&,T);
         int FE(NodoA<T>*);
+
+        NodoA<T>* padre(NodoA<T>* h)
+        {
+            NodoA<T>* p,*q;
+            p=this->mpraiz;
+            T d=h->valor;
+            while (p)
+            {
+                if (d==p->valor) break;
+                q=p;
+                if (d>p->valor) p=p->mpson[1];
+                else p=p->mpson[0];
+            }
+            return q;
+        }
+
+        void begin()
+        {
+            NodoA<T>*aux=mpraiz;
+            while (aux->mpson[0])
+                aux=aux->mpson[0];
+            current=aux;
+        }
+        NodoA<T>* end()
+        {
+            NodoA<T>*aux=mpraiz;
+            while (aux->mpson[1])
+                aux=aux->mpson[1];
+            mplast=aux;
+            return aux;
+        }
+        bool terminate()
+        {
+            if (!current->mpson[1] && current==mplast) return true;
+            return false;
+        }
+        void next()
+        {
+            if (!current) return ;
+            NodoA<T>*aux=current;
+            //std::cout<<"actual: "<<aux->valor<<std::endl;
+            if (aux->mpson[1]) current=current->mpson[1];
+            else
+            {
+                NodoA<T>* p=padre(aux);
+                while(aux->valor > p->valor)
+                {
+                    aux=p;
+                    p=padre(aux);
+                }
+                current=p;
+
+            }
+        }
+
+        
+
+        Palabra getData()
+        {
+            return current->valor;
+        }
+
         virtual ~AVL(){}
     protected:
     public:
         NodoA<T>* mpraiz;
-        //NodoA<T>* current;
-        //NodoA<T>* mplast;
+        NodoA<T>* current;
+        NodoA<T>* mplast;
 };
 
 template <class T>
@@ -132,7 +194,7 @@ void AVL<T>::ver(NodoA<T>* h,int n)
     ver(h->mpson[1],n+1);
     for (int i=0;i<n;i++)
         std::cout<<"    ";
-    std::cout<<"|"<<h->valor<<","<<FE(h)<<","<<h->altura<<std::endl;
+    std::cout<<"|"<<h->valor.idioma1<<","<<FE(h)<<","<<h->altura<<std::endl;
     ver(h->mpson[0],n+1);
 }
 

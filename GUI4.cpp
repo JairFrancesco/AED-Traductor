@@ -234,7 +234,7 @@ void GUI4::on_cbTipoEd_currentIndexChanged(int index)
         msgBox->setText("Arbol Binario sin Balancear");
         msgBox->show();
         estructuraSeleccionada = BST;
-        //this->estructura=new Tree<Palabra>;
+        this->estructura=new Btree<Palabra>;
     } else if (index==2)
     {
         msgBox->setText("Ha Seleccionado AVL");

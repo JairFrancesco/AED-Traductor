@@ -6,6 +6,7 @@
 #include "ui_GUI4.h"
 #include <rbtree.h>
 #include <Lista.h>
+#include <arbolbb.h>
 #include <Fheap.h>
 #include <NodoF.h>
 #include <AVL.h>
