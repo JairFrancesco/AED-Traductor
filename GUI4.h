@@ -2,9 +2,8 @@
 #define _GUI_h
 
 #include <QMainWindow>
-#include <palabra.h>
+
 #include "ui_GUI4.h"
-#include <rbnode.h>
 #include <rbtree.h>
 #include <Lista.h>
 #include <Fheap.h>
