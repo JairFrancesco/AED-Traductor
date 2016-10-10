@@ -4,11 +4,11 @@
 #include <rbnode.h>
 #include <iomanip>
 #include <iostream>
-
+#include <searchstructure.h>
 using namespace std;
 
 template <class T>
-class RBTree
+class RBTree : public SearchStructure
 {
     public:
         RBTree()
@@ -19,6 +19,8 @@ class RBTree
             m_pnil_node->m_pDerecha = m_pnil_node;
             m_pnil_node->m_pIzquierda = m_pnil_node;
             m_pRoot = m_pnil_node;
+            m_pcurrent=0;
+            m_plast=0;
         };
 
         RBNode<T>* getTreeMinimum(RBNode<T>* m_pRoot);
@@ -28,6 +30,51 @@ class RBTree
         void eliminar(T data);
         void printInOrder(RBNode<T>* p);
         void postorder(RBNode<T>* p, int indent =0);
+
+        void begin()
+        {
+            RBNode<T>* aux= m_pRoot;
+            while(aux->m_pIzquierda)
+                aux=aux->m_pIzquierda;
+            m_pcurrent=aux;
+        }
+
+        RBNode<T>* end()
+        {
+            RBNode<T>*aux=m_pRoot;
+            while (aux->m_pDerecha)
+                aux=aux->m_pDerecha;
+            m_plast=aux;
+            return aux;
+        }
+
+        bool terminate()
+        {
+            if (!m_pcurrent->m_pDerecha && m_pcurrent==m_plast) return true;
+            return false;
+        }
+
+        void next()
+        {
+            if (!m_pcurrent) return;
+            RBNode<T>* aux=m_pcurrent;
+            if (aux->m_pDerecha) m_pcurrent=m_pcurrent->m_pDerecha;
+            else
+            {
+                while((aux->m_pPadre)->soyDerecho())
+                {
+                    aux=aux->m_pPadre;
+                }
+                m_pcurrent=aux->m_pPadre;
+            }
+        }
+
+        Palabra getData()
+        {
+            return m_pcurrent->m_Dato;
+        }
+
+
         RBNode<T>* getRaiz()
         {
             return m_pRoot;
@@ -36,6 +83,8 @@ class RBTree
     private:
         RBNode<T>* m_pRoot;
         RBNode<T>* m_pnil_node;
+        RBNode<T>* m_pcurrent;
+        RBNode<T>* m_plast;
 
         void rotacionIzquierda(RBNode<T>* p);
         void rotacionDerecha(RBNode<T>* p);

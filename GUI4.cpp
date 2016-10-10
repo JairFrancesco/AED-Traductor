@@ -118,11 +118,7 @@ GUI4::GUI4()
     fheap->insertar(24);
 
     //fheap->mostrar();
-    this->lista=0;
-    this->arbol=0;
-    this->avl=0;
-    estructuraSeleccionada =List;
-   this->lista=new Lista<Palabra>;
+  
     estructura=new Lista<Palabra>;
  }
 
@@ -217,48 +213,45 @@ void GUI4::on_cbTipoEd_currentIndexChanged(int index)
     QMessageBox* msgBox;
     msgBox  = new QMessageBox();
     msgBox->setWindowTitle("Mensaje de prueba");
-    this->lista=0;
-    this->arbol=0;
-    this->avl=0;
     
     if (index==0)
     {
         msgBox->setText("Ha Seleccionado Lista");
         msgBox->show();
-        estructuraSeleccionada = List;
-        this->lista=new Lista<Palabra>;
+        //estructuraSeleccionada = List;
+        //this->lista=new Lista<Palabra>;
         estructura=new Lista<Palabra>;
 
     } else if (index==1)
     {
         msgBox->setText("Arbol Binario sin Balancear");
         msgBox->show();
-        estructuraSeleccionada = BST;
+        //estructuraSeleccionada = BST;
         this->estructura=new Btree<Palabra>;
     } else if (index==2)
     {
         msgBox->setText("Ha Seleccionado AVL");
         msgBox->show();
-        estructuraSeleccionada = Avl;
-        this->avl=new AVL<Palabra>;
-        //estructura=new AVL<Palabra>;
+        //estructuraSeleccionada = Avl;
+        //this->avl=new AVL<Palabra>;
+        estructura=new AVL<Palabra>;
     } else if (index==3)
     {
         msgBox->setText("Ha Seleccionado Red-Black");
         msgBox->show();
-        estructuraSeleccionada = RedBlack;
-        this->arbol= new RBTree<Palabra>;
-        //estructura=new RBTree<Palabra>;
+        //estructuraSeleccionada = RedBlack;
+        //this->arbol= new RBTree<Palabra>;
+        estructura=new RBTree<Palabra>;
     } else if (index==4)
     {
         msgBox->setText("Ha Seleccionado Binomial Heap");
         msgBox->show();
-        estructuraSeleccionada = BinomialHeap;
+        //estructuraSeleccionada = BinomialHeap;
     } else if (index==5)
     {
         msgBox->setText("Ha Seleccionado Fibonacci Heap");
         msgBox->show();
-        estructuraSeleccionada = FibonacciHeap;
+        //estructuraSeleccionada = FibonacciHeap;
     } else
     {
         msgBox->setText("Ha Seleccionado otros");

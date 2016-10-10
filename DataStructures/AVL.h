@@ -44,13 +44,13 @@ class AVL :public SearchStructure
                 aux=aux->mpson[0];
             current=aux;
         }
-        NodoA<T>* end()
+        void end()
         {
             NodoA<T>*aux=mpraiz;
             while (aux->mpson[1])
                 aux=aux->mpson[1];
             mplast=aux;
-            return aux;
+            //return aux;
         }
         bool terminate()
         {
@@ -238,10 +238,7 @@ void AVL<T>::insertar(T d)
     NodoA<T>** p;
     if (find(p,d)) return;
     *p=new NodoA<T>(d);
-
     altura(mpraiz);
-        ver(mpraiz,0);
-    std::cout<<"-------------------------"<<std::endl;
     balancear(mpraiz);
 
 }

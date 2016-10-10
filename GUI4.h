@@ -43,12 +43,9 @@ public slots:
 
 
 protected:
-  Lista<Palabra> *lista;
-  RBTree<Palabra> *arbol;
-  AVL<Palabra> * avl;
   Fheap<int> *fheap = new Fheap<int>();
 
-  Estructuras estructuraSeleccionada;
+  //Estructuras estructuraSeleccionada;
   SearchStructure* estructura;
   vtkRenderer* Renderizador;
   //vtkRenderer* Ren2;
