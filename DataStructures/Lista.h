@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <nodo.h>
+#include <searchstructure.h>
+
 
 using namespace std;
 
+
 template <class T>
-class Lista
+class Lista : public SearchStructure
 {
     public:
         Lista(){
@@ -15,6 +18,8 @@ class Lista
         void push_front(T d);
         void find(T d, Nodo<T>* p);
         void Add(T d,Nodo<T>*& p);
+        void insertar(Palabra d);
+        std::vector<Palabra> find(Palabra d);
         void pushBack(T d);
         void print();
         void max_r(Nodo<T>* aux, T maximum);
@@ -106,6 +111,35 @@ class Lista
         Nodo<T>* m_pCurrent;
 };
 
+template<class T>
+std::vector<Palabra> Lista<T>::find(Palabra d)
+{
+    Nodo<T>* aux= m_phead;
+    std::vector<Palabra> v;
+    while (aux)
+    {
+        if (aux->m_dato==d)
+            v.push_back(aux->m_dato);
+        aux=aux->m_psig;
+    }
+    return v;
+
+}
+
+template<class T>
+void Lista<T>::insertar(Palabra d)
+{
+    Nodo<T>* nuevo=new Nodo<T>(d);
+    if (!m_phead)
+    {
+        m_phead=m_plast=nuevo;
+    }
+    else
+    {
+        m_plast->m_psig= nuevo;
+        m_plast=nuevo;
+    }
+}
 
 template<class T>
 void Lista<T>::pushBack(T d){

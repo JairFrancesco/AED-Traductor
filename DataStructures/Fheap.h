@@ -4,7 +4,6 @@
 #include <math.h>
 #include <algorithm>
 #include <vector>
-#include <palabra.h>
 
 
 template <class T>

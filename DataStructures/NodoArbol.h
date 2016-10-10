@@ -2,21 +2,21 @@
 #define NODO_H
 
 template <class T>
-class Nodo
+class NodoA
 {
     public:
-        Nodo(T d)
+        NodoA(T d)
         {
             this->valor=d;
             this->altura=0;
             mpson[0]=mpson[1]=0;
         }
-        virtual ~Nodo(){}
+        virtual ~NodoA(){}
     protected:
     public:
         T valor;
         int altura;
-        Nodo<T>* mpson[2];
+        NodoA<T>* mpson[2];
 
 };
 

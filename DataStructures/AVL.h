@@ -10,26 +10,27 @@ class AVL
         {
             this->mpraiz=0;
         }
-        void mostrar(Nodo<T>*);
+        void mostrar(NodoA<T>*);
         void insertar(T d);
-        void rdd(Nodo<T>**&,bool);
-        void rii(Nodo<T>*);
-        void ver(Nodo<T>*,int);
-        void rdi(Nodo<T>**&,bool);
-        void rid(Nodo<T>*);
-        int altura(Nodo<T>*);
-        void balancear(Nodo<T>*&);
-
-        bool find(Nodo<T>**&,T);
-        int FE(Nodo<T>*);
+        void rdd(NodoA<T>**&,bool);
+        void rii(NodoA<T>*);
+        void ver(NodoA<T>*,int);
+        void rdi(NodoA<T>**&,bool);
+        void rid(NodoA<T>*);
+        int altura(NodoA<T>*);
+        void balancear(NodoA<T>*&);
+        bool find(NodoA<T>**&,T);
+        int FE(NodoA<T>*);
         virtual ~AVL(){}
     protected:
     public:
-        Nodo<T>* mpraiz;
+        NodoA<T>* mpraiz;
+        //NodoA<T>* current;
+        //NodoA<T>* mplast;
 };
 
 template <class T>
-void AVL<T>::balancear(Nodo<T>*& h)
+void AVL<T>::balancear(NodoA<T>*& h)
 {
     if (!h) return;
     balancear(h->mpson[0]);
@@ -37,7 +38,7 @@ void AVL<T>::balancear(Nodo<T>*& h)
     if(!h->mpson[0]&&!h->mpson[1]){
         return;
     }
-    Nodo<T>**aux=&h;
+    NodoA<T>**aux=&h;
     if(h->mpson[0]&&h->mpson[1]){
         if(FE(h)>1)
         {
@@ -109,7 +110,7 @@ void AVL<T>::balancear(Nodo<T>*& h)
 
 
 template <class T>
-int AVL<T>::FE(Nodo<T>* h)
+int AVL<T>::FE(NodoA<T>* h)
 {
     if (!h) return 0;
     //int b=altura(this->mpraiz);
@@ -125,7 +126,7 @@ int AVL<T>::FE(Nodo<T>* h)
 
 
 template <class T>
-void AVL<T>::ver(Nodo<T>* h,int n)
+void AVL<T>::ver(NodoA<T>* h,int n)
 {
     if (!h) return;
     ver(h->mpson[1],n+1);
@@ -136,7 +137,7 @@ void AVL<T>::ver(Nodo<T>* h,int n)
 }
 
 template <class T>
-void AVL<T>::mostrar(Nodo<T>* h)
+void AVL<T>::mostrar(NodoA<T>* h)
 {
     if (!h) return;
     std::cout<<h->valor<<" -> ";
@@ -145,7 +146,7 @@ void AVL<T>::mostrar(Nodo<T>* h)
 }
 
 template <class T>
-bool AVL<T>::find(Nodo<T>**&p,T d)
+bool AVL<T>::find(NodoA<T>**&p,T d)
 {
     p=&mpraiz;
     while (*p)
@@ -158,7 +159,7 @@ bool AVL<T>::find(Nodo<T>**&p,T d)
 }
 
 template <class T>
-int AVL<T>::altura(Nodo<T>* h)
+int AVL<T>::altura(NodoA<T>* h)
 {
     /*if (!h->mpson[0]&&!h->mpson[1]) return 0;
     if (h->mpson[0]&& !h->mpson[1]) return altura(h->mpson[0]);
@@ -172,9 +173,9 @@ int AVL<T>::altura(Nodo<T>* h)
 template <class T>
 void AVL<T>::insertar(T d)
 {
-    Nodo<T>** p;
+    NodoA<T>** p;
     if (find(p,d)) return;
-    *p=new Nodo<T>(d);
+    *p=new NodoA<T>(d);
 
     altura(mpraiz);
         ver(mpraiz,0);
@@ -184,9 +185,9 @@ void AVL<T>::insertar(T d)
 }
 
 template <class T>
-void AVL<T>::rdd(Nodo<T>**& h,bool l)
+void AVL<T>::rdd(NodoA<T>**& h,bool l)
 {
-    Nodo<T>* aux=(*h);
+    NodoA<T>* aux=(*h);
     (*h)=aux->mpson[l];
     if ((*h)->mpson[!l]) aux->mpson[l]=(*h)->mpson[!l];
     else aux->mpson[l]=0;
@@ -195,10 +196,10 @@ void AVL<T>::rdd(Nodo<T>**& h,bool l)
 }
 
 template <class T>
-void AVL<T>::rdi(Nodo<T>**& h, bool l)
+void AVL<T>::rdi(NodoA<T>**& h, bool l)
 {
-    Nodo<T>* aux=(*h)->mpson[l];
-    Nodo<T>* sn=(*h);
+    NodoA<T>* aux=(*h)->mpson[l];
+    NodoA<T>* sn=(*h);
     (*h)=aux->mpson[!l];
     if ((*h)->mpson[!l]) sn->mpson[l]=(*h)->mpson[!l];
     else sn->mpson[l]=0;
