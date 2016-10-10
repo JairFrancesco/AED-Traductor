@@ -7,15 +7,15 @@
 using namespace std;
 
 template<class T>
-class NodoB
+class NodoBHeap
 {
-    typedef NodoB<T> *  pNodo;
+    typedef NodoBHeap<T> *  pNodo;
     public:
       int                m_Grado;
       T                  m_Dato;
       pNodo              m_pPadre;
       list< pNodo >      m_Son;
-     NodoB(T d)
+     NodoBHeap(T d)
       {
            m_Dato = d;
            m_Grado =0;
@@ -23,20 +23,52 @@ class NodoB
 };
 
 template<class T>
-class BinomialHeap
+class Bheap
 {
-    typedef NodoB<T> *  pNodo;
+    typedef NodoBHeap<T> *  pNodo;
     typedef    list< pNodo >       TLista;
     typedef typename   TLista::iterator  TIterator;
 
     private:
       TLista  m_Heads;
     public:
-      BinomialHeap(){};
+      Bheap(){};
+      TLista getRaices()
+      {
+          return m_Heads;
+      }
       void Insert(T d)
       {
-          m_Heads.push_back(new NodoB<T>(d));
+          m_Heads.push_back(new NodoBHeap<T>(d));
           merge();
+      }
+      void insertarpalabra(Palabra pal)
+      {
+          string a=pal.idioma1;
+          int i,res;
+          i=res=0;
+          while (a[i]!='\0')
+          {
+              int c=a[i];
+              res=res+c;
+              i++;
+          }
+          int reso=res;
+          Insert(reso);
+          /*
+          for (std::vector<string>::iterator it=pal.idioma2.begin();it!=pal.idioma2.end();it++)
+          {
+
+              while (a[i]!='\0')
+              {
+                  int c=a[i];
+                  res=res+c;
+                  i++;
+              }
+              insertar(res);
+              res=reso;
+          }
+          */
       }
       T minimo()
       {
