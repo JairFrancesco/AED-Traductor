@@ -48,6 +48,10 @@ class Fheap
         void actualizar_min();
         void borrar(NodoF<T>*&);
         void unir(Fheap<T>);
+        Flista getRaices()
+        {
+            return this->raices;
+        }
         void ver_raices()
         {
             std::cout<<"raices: ";

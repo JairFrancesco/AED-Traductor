@@ -7,7 +7,10 @@
 #include <rbtree.h>
 #include <Lista.h>
 #include <Fheap.h>
+#include <NodoF.h>
+//#include <nodofibonacci.h>
 #include <QStandardItemModel>
+//#include <fibonacci.h>
 
 
 class vtkRenderer;
@@ -31,6 +34,7 @@ public slots:
              void * client_data, void *,
              vtkCommand * command);
   void color1(QAction*);
+  void graficarHeap(std::list<NodoF<int>*>, double, double, double, bool);
   void cargarDatosaEstructura(QString _rutaArchivo);
   //void color2(QAction*);
 
@@ -38,6 +42,7 @@ public slots:
 protected:
   Lista<Palabra> *lista = new Lista<Palabra>();
   RBTree<Palabra> *arbol = new RBTree<Palabra>();
+  Fheap<int> *fheap = new Fheap<int>();
   Estructuras estructuraSeleccionada;
   vtkRenderer* Renderizador;
   //vtkRenderer* Ren2;
