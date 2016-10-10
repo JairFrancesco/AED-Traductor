@@ -39,6 +39,7 @@ public slots:
 protected:
   Lista<Palabra> *lista = new Lista<Palabra>();
   RBTree<Palabra> *arbol = new RBTree<Palabra>();
+  Fheap<int> *fheap = new Fheap<int>();
   Estructuras estructuraSeleccionada;
   vtkRenderer* Renderizador;
   //vtkRenderer* Ren2;

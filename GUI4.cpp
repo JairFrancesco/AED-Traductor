@@ -328,6 +328,7 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
                 cout<<"Idioma1:"<<idioma1<<"Idioma2:"<<idioma2<<endl;
 
                 Palabra p(idioma1, v);
+                fheap->insertarpalabra(p);
                 //Se inserta segun la estructura
                 if (estructuraSeleccionada == List)
                 {
@@ -349,6 +350,7 @@ void GUI4::cargarDatosaEstructura(QString _rutaArchivo)
   QString s = QString::number(nMilliseconds);
   txtTiempoCarga->setText(s);
   tblDiccionario->setModel(this->model);
+  fheap->mostrar();
 }
 
 void GUI4::on_btnCargar_clicked()
