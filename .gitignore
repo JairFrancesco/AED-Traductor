@@ -1,3 +1,11 @@
 AEDTraductor.pro
 AEDTraductor.pro.user
 CMakeFiles
+AED_Diccionario
+AED_Diccionario_automoc.cpp
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+moc_GUI4.cpp
+ui_GUI4.h
+listas.cpp

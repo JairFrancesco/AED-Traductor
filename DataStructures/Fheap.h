@@ -83,19 +83,20 @@ void Fheap<T>::insertarpalabra(Palabra pal)
         res=res+c;
         i++;
     }
-
+    int reso=res;
     for (std::vector<string>::iterator it=pal.idioma2.begin();it!=pal.idioma2.end();it++)
     {
-        i=0;
+
         while (a[i]!='\0')
         {
             int c=a[i];
             res=res+c;
             i++;
-        }        
+        }
+        insertar(res);
+        res=reso;
     }
 
-    insertar(res);
 
 
 }
